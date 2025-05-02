@@ -54,7 +54,6 @@ class AddMedicineInputModel {
       pharmacyName: addMedicineInputEntity.pharmacyName,
       pharmacyId: addMedicineInputEntity.pharmacyId,
       pharmcyAddress: addMedicineInputEntity.pharmcyAddress,
-      imageUrl: addMedicineInputEntity.imageUrl,
     );
   }
 

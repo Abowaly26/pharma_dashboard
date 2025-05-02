@@ -16,10 +16,10 @@ class AddMedicineInputEntity {
   final String pharmcyAddress;
   final num avgRating = 0;
   final int ratingCount = 0;
-  final List<ReviewEntity> revddddiews;
+  final List<ReviewEntity> reviews;
 
   AddMedicineInputEntity({
-    required this.revddddiews,
+    required this.reviews,
     required this.pharmacyName,
     required this.pharmacyId,
     required this.pharmcyAddress,
