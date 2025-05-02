@@ -1,0 +1,31 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pharma_dashboard/core/helper_functions.dart/build_error_bar.dart';
+import 'package:pharma_dashboard/core/widgets/custom_progress_hud.dart';
+import 'package:pharma_dashboard/features/add_product/presentation/manager/products_cubit/add_medicine_cubit.dart';
+
+import 'add_medicine_view_body.dart';
+
+class AddMedicineViewBodyBlocBuilder extends StatelessWidget {
+  const AddMedicineViewBodyBlocBuilder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<AddMedicineCubit, AddMedicineState>(
+      listener: (context, state) {
+        if (state is AddMedicineSuccess) {
+          buildBar(context, 'Medicine added successfully');
+        }
+        if (state is AddMedicineFailure) {
+          buildBar(context, state.errMessage);
+        }
+      },
+      builder: (context, state) {
+        return CustomProgressHud(
+          isLoading: state is AddMedicineLoading,
+          child: const AddMedicineViewBody(),
+        ); // (child: const AddMedicineViewBody());
+      },
+    );
+  }
+}

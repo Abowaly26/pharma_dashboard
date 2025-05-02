@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "899708379709",
+    "project_id": "pharmanow-754a7",
+    "storage_bucket": "pharmanow-754a7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899708379709:android:73edc66c9ff31004b38054",
+        "android_client_info": {
+          "package_name": "com.example.pharma_dashboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "899708379709-3uddei3tdueipkcfk6ktvnppt3mveg25.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKWX44ZDBZuV9Yj_rp1kL4Ydn9HbQuzfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "899708379709-3uddei3tdueipkcfk6ktvnppt3mveg25.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "899708379709-3k1solcl9k97qcuk6tu16e8m0u7k1e77.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pharmaNow"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899708379709:android:c0899fc0febcd747b38054",
+        "android_client_info": {
+          "package_name": "com.example.pharma_now"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "899708379709-ugjfp5rjpcnlrs596cvlcvs7r9nd7scu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pharma_now",
+            "certificate_hash": "2151de442ec582a186e4d4561336ee4fcd052511"
+          }
+        },
+        {
+          "client_id": "899708379709-3uddei3tdueipkcfk6ktvnppt3mveg25.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKWX44ZDBZuV9Yj_rp1kL4Ydn9HbQuzfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "899708379709-3uddei3tdueipkcfk6ktvnppt3mveg25.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "899708379709-3k1solcl9k97qcuk6tu16e8m0u7k1e77.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pharmaNow"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
