@@ -198,7 +198,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final AddMedicineInputEntity input = AddMedicineInputEntity(
-        revddddiews: [
+        reviews: [
           ReviewEntity(
             name: 'John Doe',
             date: DateTime.now().toIso8601String(),
