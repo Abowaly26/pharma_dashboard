@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:pharma_dashboard/features/add_product/domain/entities/review_entity.dart';
+import 'package:pharma_dashboard/features/add_medicine/domain/entities/review_entity.dart';
 
-class AddMedicineInputEntity {
+class MedicineEntity {
   final String name;
   final String description;
   final String code;
@@ -10,20 +10,22 @@ class AddMedicineInputEntity {
   final bool isNewProduct;
   final File image;
   final num price;
-  String? imageUrl;
+  String? subabaseImageUrl;
   final String pharmacyName;
   final int pharmacyId;
   final String pharmcyAddress;
   final num avgRating = 0;
   final int ratingCount = 0;
   final List<ReviewEntity> reviews;
+  final int discountRating;
 
-  AddMedicineInputEntity({
+  MedicineEntity({
+    required this.discountRating,
     required this.reviews,
     required this.pharmacyName,
     required this.pharmacyId,
     required this.pharmcyAddress,
-    this.imageUrl,
+    this.subabaseImageUrl,
     required this.name,
     required this.description,
     required this.code,

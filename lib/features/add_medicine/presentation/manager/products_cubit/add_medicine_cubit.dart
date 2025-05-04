@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:pharma_dashboard/core/repos/images_repo/images_repo.dart';
 import 'package:pharma_dashboard/core/repos/medicine_repo/add_medicine_repo.dart';
 
-import '../../../domain/entities/add_medicine_input_entity.dart';
+import '../../../domain/entities/medicine_entity.dart';
 
 part 'add_medicine_state.dart';
 
@@ -15,9 +15,7 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
   final MedicineRepo medicineRepo;
   final ImagesRepo imagesRepo;
 
-  Future<void> addMedicine(
-    AddMedicineInputEntity addMedicineInputEntity,
-  ) async {
+  Future<void> addMedicine(MedicineEntity addMedicineInputEntity) async {
     emit(AddMedicineLoading());
 
     var result = await imagesRepo.uploadImage(addMedicineInputEntity.image);
@@ -27,7 +25,8 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
         emit(AddMedicineFailure(f.message));
       },
       (url) async {
-        addMedicineInputEntity.imageUrl = url;
+        addMedicineInputEntity.subabaseImageUrl = url;
+
         var result = await medicineRepo.addMedicine(addMedicineInputEntity);
         result.fold(
           (f) {

@@ -6,12 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pharma_dashboard/core/widgets/button_style.dart';
 import 'package:pharma_dashboard/core/widgets/is_new_product_checkbox.dart';
-import 'package:pharma_dashboard/features/add_product/domain/entities/add_medicine_input_entity.dart';
-import 'package:pharma_dashboard/features/add_product/domain/entities/review_entity.dart';
+import 'package:pharma_dashboard/features/add_medicine/domain/entities/medicine_entity.dart';
+import 'package:pharma_dashboard/features/add_medicine/domain/entities/review_entity.dart';
+import 'package:pharma_dashboard/features/add_medicine/presentation/views/widgets/enhanced_image_input_field.dart';
 
 import '../../../../../core/utils/color_manger.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
-import '../../../../../core/widgets/image_field.dart';
+// Added the enhanced field
 import '../../manager/products_cubit/add_medicine_cubit.dart';
 
 class AddMedicineViewBody extends StatefulWidget {
@@ -30,9 +31,13 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
   num price = 0;
   int quantity = 0;
   bool isNewProduct = false;
+
+  // Updated variables to handle both local image and URL
   File? image;
+  String? imageUrl;
 
   int pharmcyId = 0;
+  int discountRating = 0;
   String? pharmcyName, pharmcyAddress;
 
   @override
@@ -76,6 +81,28 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                   }
                   if (num.tryParse(value) == null) {
                     return 'Please enter a valid price';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16.h),
+              CustomTextField(
+                onSaved: (value) {
+                  if (value != null && value.isNotEmpty) {
+                    discountRating = int.tryParse(value) ?? 0;
+                  }
+                },
+                hint: 'Discount Rate',
+                textInputType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                ],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a discount rate';
+                  }
+                  if (num.tryParse(value) == null) {
+                    return 'Please enter a valid discount rate';
                   }
                   return null;
                 },
@@ -166,9 +193,25 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                 },
               ),
               SizedBox(height: 16.h),
-              ImageField(
-                OnFileChanged: (image) {
-                  this.image = image;
+              // Replace old ImageField with the new EnhancedImageField
+              EnhancedImageField(
+                onFileChanged: (file) {
+                  setState(() {
+                    image = file;
+                    // When selecting an image file, clear the URL
+                    if (file != null) {
+                      imageUrl = null;
+                    }
+                  });
+                },
+                onUrlChanged: (url) {
+                  setState(() {
+                    imageUrl = url;
+                    // When entering a URL, clear the image file
+                    if (url != null) {
+                      image = null;
+                    }
+                  });
                 },
               ),
               SizedBox(height: 24.h),
@@ -188,16 +231,20 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
   }
 
   void _submitForm() {
-    if (image == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select an image')));
+    // Check if either an image file or URL is provided
+    if (image == null && (imageUrl == null || imageUrl!.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select an image or enter an image URL'),
+        ),
+      );
       return;
     }
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      final AddMedicineInputEntity input = AddMedicineInputEntity(
+
+      final MedicineEntity input = MedicineEntity(
         reviews: [
           ReviewEntity(
             name: 'John Doe',
@@ -208,12 +255,15 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQet2xOmvH86IcD05zovfeZJo19fgbgfrgi8g&s',
           ),
         ],
+        discountRating: discountRating,
         name: name!,
         description: description!,
         code: code!,
         quantity: quantity,
         isNewProduct: isNewProduct,
-        image: image!,
+        image:
+            image ?? File(''), // Provide a default File object or handle null
+        subabaseImageUrl: imageUrl, // Add the image URL
         price: price,
         pharmacyName: pharmcyName!,
         pharmacyAddress: pharmcyAddress!,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pharma_dashboard/core/Services/get_it_service.dart';
-import 'package:pharma_dashboard/features/add_product/presentation/manager/products_cubit/add_medicine_cubit.dart';
+import 'package:pharma_dashboard/features/add_medicine/presentation/manager/products_cubit/add_medicine_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/repos/images_repo/images_repo.dart';

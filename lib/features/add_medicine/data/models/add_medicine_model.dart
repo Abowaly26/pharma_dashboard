@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:pharma_dashboard/features/add_product/data/models/review_model.dart';
+import 'package:pharma_dashboard/features/add_medicine/data/models/review_model.dart';
 
-import '../../domain/entities/add_medicine_input_entity.dart';
+import '../../domain/entities/medicine_entity.dart';
 
-class AddMedicineInputModel {
+class AddMedicineModel {
   final String name;
   final String description;
   final String code;
@@ -12,21 +12,23 @@ class AddMedicineInputModel {
   final bool isNewProduct;
   final File image;
   final num price;
-  String? imageUrl;
+  String? subabaseImageUrl;
   final String pharmacyName;
   final int pharmacyId;
   final String pharmcyAddress;
   final num avgRating = 0;
   final int ratingCount = 0;
+  final int discountRating;
 
   final List<ReviewModel> reviews;
 
-  AddMedicineInputModel({
+  AddMedicineModel({
+    required this.discountRating,
     required this.reviews,
     required this.pharmacyName,
     required this.pharmacyId,
     required this.pharmcyAddress,
-    this.imageUrl,
+    this.subabaseImageUrl,
     required this.name,
     required this.description,
     required this.code,
@@ -36,10 +38,8 @@ class AddMedicineInputModel {
     required this.price,
   });
 
-  factory AddMedicineInputModel.fromEntity(
-    AddMedicineInputEntity addMedicineInputEntity,
-  ) {
-    return AddMedicineInputModel(
+  factory AddMedicineModel.fromEntity(MedicineEntity addMedicineInputEntity) {
+    return AddMedicineModel(
       reviews:
           addMedicineInputEntity.reviews
               .map((e) => ReviewModel.fromEntity(e))
@@ -54,6 +54,8 @@ class AddMedicineInputModel {
       pharmacyName: addMedicineInputEntity.pharmacyName,
       pharmacyId: addMedicineInputEntity.pharmacyId,
       pharmcyAddress: addMedicineInputEntity.pharmcyAddress,
+      subabaseImageUrl: addMedicineInputEntity.subabaseImageUrl,
+      discountRating: addMedicineInputEntity.discountRating,
     );
   }
 
@@ -65,7 +67,8 @@ class AddMedicineInputModel {
       'quantity': quantity,
       'isNewProduct': isNewProduct,
       'price': price,
-      'imageUrl': imageUrl,
+      'subabaseimageUrl': subabaseImageUrl,
+      'discountRating': discountRating,
 
       'pharmacyName': pharmacyName,
       'pharmacyId': pharmacyId,

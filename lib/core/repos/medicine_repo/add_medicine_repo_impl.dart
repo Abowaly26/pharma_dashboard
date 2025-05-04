@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:pharma_dashboard/core/Services/data_service.dart';
 import 'package:pharma_dashboard/core/repos/medicine_repo/add_medicine_repo.dart';
-import 'package:pharma_dashboard/features/add_product/data/models/add_medicine_input_model.dart';
-import 'package:pharma_dashboard/features/add_product/domain/entities/add_medicine_input_entity.dart';
+import 'package:pharma_dashboard/features/add_medicine/domain/entities/medicine_entity.dart';
 
+import '../../../features/add_medicine/data/models/add_medicine_model.dart';
 import '../../errors/failures.dart';
 import '../../utils/backend_endpoint.dart';
 
@@ -13,13 +13,13 @@ class MedicineRepoImpl implements MedicineRepo {
   MedicineRepoImpl(this.databaseService);
   @override
   Future<Either<Failure, void>> addMedicine(
-    AddMedicineInputEntity addMedicineInputEntity,
+    MedicineEntity addMedicineInputEntity,
   ) async {
     try {
       // Add data to the database
       await databaseService.addData(
         path: BackendEndpoint.addMedicine,
-        data: AddMedicineInputModel.fromEntity(addMedicineInputEntity).toJson(),
+        data: AddMedicineModel.fromEntity(addMedicineInputEntity).toJson(),
       );
       // Return a Right object indicating success
 

@@ -5,7 +5,7 @@ import 'package:pharma_dashboard/core/utils/app_images.dart';
 import 'package:pharma_dashboard/core/utils/color_manger.dart';
 
 import '../../../../core/utils/button_style.dart';
-import '../../../add_product/presentation/views/add_medicine_view.dart';
+import '../../../add_medicine/presentation/views/add_medicine_view.dart';
 
 class DashboardViewBody extends StatelessWidget {
   const DashboardViewBody({super.key});
