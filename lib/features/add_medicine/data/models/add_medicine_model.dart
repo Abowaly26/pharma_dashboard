@@ -22,7 +22,7 @@ class AddMedicineModel {
 
   final List<ReviewModel> reviews;
 
-  AddMedicineModel({
+  AddMedicineModel(required List<ReviewModel> reviews, {
     required this.discountRating,
     required this.reviews,
     required this.pharmacyName,
