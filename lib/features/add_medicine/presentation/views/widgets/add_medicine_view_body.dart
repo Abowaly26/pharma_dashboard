@@ -261,14 +261,15 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
         code: code!,
         quantity: quantity,
         isNewProduct: isNewProduct,
-        image:
-            image ?? File(''), // Provide a default File object or handle null
-        subabaseImageUrl: imageUrl, // Add the image URL
+        // Use empty file if we only have URL
+        image: image ?? File(''),
+        // Add image URL if available
+        subabaseORImageUrl: imageUrl,
         price: price,
-        pharmacyName: pharmcyName!,
-        pharmacyAddress: pharmcyAddress!,
+        pharmacyName: pharmcyName ?? '',
+        pharmacyAddress: pharmcyAddress ?? '',
         pharmacyId: pharmcyId,
-        pharmcyAddress: pharmcyAddress!,
+        pharmcyAddress: pharmcyAddress ?? '',
       );
 
       context.read<AddMedicineCubit>().addMedicine(input);

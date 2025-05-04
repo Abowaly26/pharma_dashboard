@@ -12,7 +12,7 @@ class AddMedicineModel {
   final bool isNewProduct;
   final File image;
   final num price;
-  String? subabaseImageUrl;
+  String? subabaseORImageUrl;
   final String pharmacyName;
   final int pharmacyId;
   final String pharmcyAddress;
@@ -22,13 +22,13 @@ class AddMedicineModel {
 
   final List<ReviewModel> reviews;
 
-  AddMedicineModel(required List<ReviewModel> reviews, {
+  AddMedicineModel({
     required this.discountRating,
     required this.reviews,
     required this.pharmacyName,
     required this.pharmacyId,
     required this.pharmcyAddress,
-    this.subabaseImageUrl,
+    this.subabaseORImageUrl,
     required this.name,
     required this.description,
     required this.code,
@@ -54,7 +54,7 @@ class AddMedicineModel {
       pharmacyName: addMedicineInputEntity.pharmacyName,
       pharmacyId: addMedicineInputEntity.pharmacyId,
       pharmcyAddress: addMedicineInputEntity.pharmcyAddress,
-      subabaseImageUrl: addMedicineInputEntity.subabaseImageUrl,
+      subabaseORImageUrl: addMedicineInputEntity.subabaseORImageUrl,
       discountRating: addMedicineInputEntity.discountRating,
     );
   }
@@ -67,9 +67,9 @@ class AddMedicineModel {
       'quantity': quantity,
       'isNewProduct': isNewProduct,
       'price': price,
-      'subabaseimageUrl': subabaseImageUrl,
+      'subabaseImageUrl':
+          subabaseORImageUrl, // Make sure field name is consistent
       'discountRating': discountRating,
-
       'pharmacyName': pharmacyName,
       'pharmacyId': pharmacyId,
       'pharmcyAddress': pharmcyAddress,

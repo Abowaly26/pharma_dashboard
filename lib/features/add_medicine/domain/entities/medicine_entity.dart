@@ -10,7 +10,7 @@ class MedicineEntity {
   final bool isNewProduct;
   final File image;
   final num price;
-  String? subabaseImageUrl;
+  String? subabaseORImageUrl;
   final String pharmacyName;
   final int pharmacyId;
   final String pharmcyAddress;
@@ -25,7 +25,7 @@ class MedicineEntity {
     required this.pharmacyName,
     required this.pharmacyId,
     required this.pharmcyAddress,
-    this.subabaseImageUrl,
+    this.subabaseORImageUrl,
     required this.name,
     required this.description,
     required this.code,

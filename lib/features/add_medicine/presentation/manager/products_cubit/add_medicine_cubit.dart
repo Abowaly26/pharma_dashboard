@@ -18,27 +18,42 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
   Future<void> addMedicine(MedicineEntity addMedicineInputEntity) async {
     emit(AddMedicineLoading());
 
-    var result = await imagesRepo.uploadImage(addMedicineInputEntity.image);
-
-    result.fold(
-      (f) {
-        emit(AddMedicineFailure(f.message));
-      },
-      (url) async {
-        addMedicineInputEntity.subabaseImageUrl = url;
-
-        var result = await medicineRepo.addMedicine(addMedicineInputEntity);
-        result.fold(
-          (f) {
-            emit(AddMedicineFailure(f.message));
-          },
-          (r) {
-            emit(AddMedicineSuccess());
-          },
-        );
-      },
-    );
+    // If there's already a URL link, use it directly without uploading
+    if (addMedicineInputEntity.subabaseORImageUrl != null &&
+        addMedicineInputEntity.subabaseORImageUrl!.isNotEmpty) {
+      // Use URL directly
+      var result = await medicineRepo.addMedicine(addMedicineInputEntity);
+      result.fold(
+        (f) {
+          emit(AddMedicineFailure(f.message));
+        },
+        (r) {
+          emit(AddMedicineSuccess());
+        },
+      );
+    } else {
+      // If there's a local image file, upload it first
+      var result = await imagesRepo.uploadImage(addMedicineInputEntity.image);
+      result.fold(
+        (f) {
+          emit(AddMedicineFailure(f.message));
+        },
+        (url) async {
+          addMedicineInputEntity.subabaseORImageUrl = url;
+          var result = await medicineRepo.addMedicine(addMedicineInputEntity);
+          result.fold(
+            (f) {
+              emit(AddMedicineFailure(f.message));
+            },
+            (r) {
+              emit(AddMedicineSuccess());
+            },
+          );
+        },
+      );
+    }
   }
+}
 
   // final MedicineRepo productsRepo;
 
@@ -62,4 +77,4 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
   //     emit(MedicineSuccess(products));
   //   });
   // }
-}
+
