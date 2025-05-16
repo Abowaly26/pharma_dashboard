@@ -88,7 +88,7 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
         Row(
           children: [
             Text(
-              'Product Image',
+              'Medicine Image',
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
