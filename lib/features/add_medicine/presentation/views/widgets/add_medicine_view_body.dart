@@ -190,18 +190,35 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                       discountRating = int.tryParse(value) ?? 0;
                     }
                   },
-                  hint: 'Discount Rate',
+                  hint: 'Discount Rate (1-100)',
                   textInputType: TextInputType.number,
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*$')),
+                    FilteringTextInputFormatter.digitsOnly,
+                    // منع إدخال أرقام أكبر من 100
+                    TextInputFormatter.withFunction((oldValue, newValue) {
+                      if (newValue.text.isEmpty) return newValue;
+
+                      final value = int.tryParse(newValue.text);
+                      if (value == null || value > 100) {
+                        return oldValue; // إرجاع القيمة القديمة إذا كانت أكبر من 100
+                      }
+                      return newValue;
+                    }),
                   ],
                   validator: (value) {
                     if (hasDiscount) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a discount rate';
                       }
-                      if (num.tryParse(value) == null) {
+
+                      final discountValue = int.tryParse(value);
+                      if (discountValue == null) {
                         return 'Please enter a valid discount rate';
+                      }
+
+                      // التحقق من أن القيمة بين 1 و 100
+                      if (discountValue < 1 || discountValue > 100) {
+                        return 'Discount rate must be between 1 and 100';
                       }
                     }
                     return null;
