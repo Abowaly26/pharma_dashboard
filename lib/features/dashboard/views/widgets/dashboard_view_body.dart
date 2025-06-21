@@ -17,30 +17,30 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
   int _lowStockCount = 0;
   bool _isLoading = true;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _loadData();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
-  // Future<void> _loadData() async {
-  //   print('Starting to load data...');
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
+  Future<void> _loadData() async {
+    print('Starting to load data...');
+    setState(() {
+      _isLoading = true;
+    });
 
-  //   try {
-  //     await Future.wait([_fetchTotalMedicines(), _fetchLowStockCount()]);
-  //     print('All data loaded successfully');
-  //   } catch (e) {
-  //     print('Error loading data: $e');
-  //     if (mounted) {
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     }
-  //   }
-  // }
+    try {
+      await _fetchTotalMedicines();
+      print('All data loaded successfully');
+    } catch (e) {
+      print('Error loading data: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   // Future<void> _fetchLowStockCount() async {
   //   final repo = getIt<MedicineRepo>();
@@ -60,27 +60,27 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
   //   }
   // }
 
-  // Future<void> _fetchTotalMedicines() async {
-  //   final repo = getIt<MedicineRepo>();
-  //   final result = await repo.getTotalMedicinesCount();
+  Future<void> _fetchTotalMedicines() async {
+    final repo = getIt<MedicineRepo>();
+    final result = await repo.getTotalMedicinesCount();
 
-  //   if (mounted) {
-  //     setState(() {
-  //       result.fold(
-  //         (failure) {
-  //           _totalMedicines = 0;
-  //           ScaffoldMessenger.of(context).showSnackBar(
-  //             const SnackBar(content: Text('Failed to load medicines count')),
-  //           );
-  //         },
-  //         (count) {
-  //           _totalMedicines = count;
-  //         },
-  //       );
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
+    if (mounted) {
+      setState(() {
+        result.fold(
+          (failure) {
+            _totalMedicines = 0;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Failed to load medicines count')),
+            );
+          },
+          (count) {
+            _totalMedicines = count;
+          },
+        );
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +210,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                             () => Navigator.pushNamed(
                               context,
                               AddMedicineView.routeName,
-                            ),
+                            ).then((_) => _loadData()),
                       ),
                       SizedBox(height: 16.h),
                       _buildActionButton(

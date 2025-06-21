@@ -29,4 +29,16 @@ class MedicineRepoImpl implements MedicineRepo {
       return Left(ServerFailure('Failed to add product'));
     }
   }
+
+  @override
+  Future<Either<Failure, int>> getTotalMedicinesCount() async {
+    try {
+      final data = await databaseService.getData(
+        path: BackendEndpoint.addMedicine,
+      );
+      return Right(data.length);
+    } catch (e) {
+      return Left(ServerFailure('Failed to get medicines count'));
+    }
+  }
 }

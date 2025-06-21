@@ -7,4 +7,5 @@ abstract class MedicineRepo {
   Future<Either<Failure, void>> addMedicine(
     MedicineEntity addMedicineInputEntity,
   );
+  Future<Either<Failure, int>> getTotalMedicinesCount();
 }
