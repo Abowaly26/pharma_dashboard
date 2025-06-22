@@ -506,6 +506,19 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                       isLoading
                           ? null
                           : () async {
+                            // تحقق من وجود صورة أو رابط صورة
+                            if (image == null &&
+                                (imageUrl == null || imageUrl!.isEmpty)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Please select an image or enter an image URL.',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
                             if (_formKey.currentState!.validate()) {
                               setState(() {
                                 isLoading = true;
