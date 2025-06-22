@@ -89,4 +89,42 @@ class MedicineRepoImpl implements MedicineRepo {
       return Left(ServerFailure('Failed to update medicine'));
     }
   }
+
+  @override
+  Stream<Either<Failure, int>> getLowStockCount() {
+    try {
+      return databaseService
+          .getDataStream(path: BackendEndpoint.addMedicine)
+          .map((snapshot) {
+            int lowStockCount = 0;
+            for (var doc in (snapshot as List)) {
+              final medicine = AddMedicineModel.fromJson(doc);
+              if (medicine.quantity <= 10) {
+                lowStockCount++;
+              }
+            }
+            return Right(lowStockCount);
+          });
+    } catch (e) {
+      return Stream.value(Left(ServerFailure('Failed to get low stock count')));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<MedicineEntity>>> getLowStockMedicines() async {
+    try {
+      final data = await databaseService.getData(
+        path: BackendEndpoint.addMedicine,
+      );
+      final medicines =
+          (data as List).map((e) => AddMedicineModel.fromJson(e)).toList();
+      final lowStockMedicines =
+          medicines.where((element) => element.quantity <= 10).toList();
+      return Right(lowStockMedicines);
+    } catch (e, s) {
+      debugPrint('Failed to get medicines: $e');
+      debugPrint(s.toString());
+      return Left(ServerFailure('Failed to get medicines'));
+    }
+  }
 }

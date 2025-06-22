@@ -13,4 +13,6 @@ abstract class MedicineRepo {
   Future<Either<Failure, void>> updateMedicine({
     required MedicineEntity medicineEntity,
   });
+  Stream<Either<Failure, int>> getLowStockCount();
+  Future<Either<Failure, List<MedicineEntity>>> getLowStockMedicines();
 }

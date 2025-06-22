@@ -32,6 +32,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
 
     try {
       await _fetchTotalMedicines();
+      await _fetchLowStockCount();
       print('All data loaded successfully');
     } catch (e) {
       print('Error loading data: $e');
@@ -43,23 +44,23 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
     }
   }
 
-  // Future<void> _fetchLowStockCount() async {
-  //   final repo = getIt<MedicineRepo>();
-  //   final result = await repo.getLowStockMedicines();
+  Future<void> _fetchLowStockCount() async {
+    final repo = getIt<MedicineRepo>();
+    final result = await repo.getLowStockMedicines();
 
-  //   if (mounted) {
-  //     setState(() {
-  //       result.fold(
-  //         (failure) {
-  //           _lowStockCount = 0;
-  //         },
-  //         (medicines) {
-  //           _lowStockCount = medicines.length;
-  //         },
-  //       );
-  //     });
-  //   }
-  // }
+    if (mounted) {
+      setState(() {
+        result.fold(
+          (failure) {
+            _lowStockCount = 0;
+          },
+          (medicines) {
+            _lowStockCount = medicines.length;
+          },
+        );
+      });
+    }
+  }
 
   Future<void> _fetchTotalMedicines() async {
     final repo = getIt<MedicineRepo>();

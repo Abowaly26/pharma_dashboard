@@ -16,4 +16,9 @@ abstract class DatabaseService {
   });
 
   Future<void> deleteData({required String path, required String documentId});
+
+  Stream<dynamic> getDataStream({
+    required String path,
+    Map<String, dynamic>? query,
+  });
 }
