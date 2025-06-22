@@ -18,7 +18,15 @@ class EditView extends StatelessWidget {
       child: Scaffold(
         backgroundColor: ColorManager.primaryColor,
         appBar: AppBar(
-          title: const Text('Manage Inventory'),
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: const Text(
+            'Manage Inventory',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           backgroundColor: const Color(0xFF667EEA),
         ),
         body: const EditViewBody(),

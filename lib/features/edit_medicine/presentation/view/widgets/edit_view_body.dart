@@ -188,7 +188,7 @@ class _EditViewBodyState extends State<EditViewBody> {
       onRefresh: () async {
         context.read<EditMedicineCubit>().getMedicines();
       },
-      color: ColorManager.primaryColor,
+      color: ColorManager.secondaryColor,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -299,6 +299,7 @@ class _EditViewBodyState extends State<EditViewBody> {
               ),
             ),
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            checkmarkColor: Colors.white,
           );
         },
       ),
@@ -575,7 +576,11 @@ class _EditViewBodyState extends State<EditViewBody> {
               onPressed: () {
                 context.read<EditMedicineCubit>().getMedicines();
               },
-              icon: Icon(Icons.refresh, size: 18.sp),
+              icon: Icon(
+                Icons.refresh_rounded,
+                size: 18.sp,
+                color: ColorManager.secondaryColor,
+              ),
               label: Text(
                 'Try Again',
                 style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
