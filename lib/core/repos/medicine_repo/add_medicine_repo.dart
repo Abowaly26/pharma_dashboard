@@ -8,4 +8,9 @@ abstract class MedicineRepo {
     MedicineEntity addMedicineInputEntity,
   );
   Future<Either<Failure, int>> getTotalMedicinesCount();
+  Future<Either<Failure, List<MedicineEntity>>> getProducts();
+  Future<Either<Failure, void>> deleteMedicine({required String medicineId});
+  Future<Either<Failure, void>> updateMedicine({
+    required MedicineEntity medicineEntity,
+  });
 }

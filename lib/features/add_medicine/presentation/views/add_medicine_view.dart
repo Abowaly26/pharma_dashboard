@@ -9,12 +9,14 @@ import '../../../../core/repos/medicine_repo/add_medicine_repo.dart';
 import '../../../../core/utils/color_manger.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../dashboard/views/dashboard_view.dart';
+import '../../domain/entities/medicine_entity.dart';
 import 'widgets/add_medicine_view_body.dart';
 import 'widgets/add_product_view_body_bloc_builder.dart';
 
 class AddMedicineView extends StatelessWidget {
-  const AddMedicineView({super.key});
+  const AddMedicineView({super.key, this.medicine});
   static const String routeName = 'AddProductView';
+  final MedicineEntity? medicine;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class AddMedicineView extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(48.sp),
         child: PharmaAppBar(
-          title: 'Add Medicine ',
+          title: medicine == null ? 'Add Medicine' : 'Edit Medicine',
           isBack: true,
           onPressed: () {
             Navigator.pushReplacementNamed(context, DashboardView.routeName);
@@ -36,7 +38,7 @@ class AddMedicineView extends StatelessWidget {
               getIt.get<MedicineRepo>(),
               getIt.get<ImagesRepo>(),
             ),
-        child: AddMedicineViewBodyBlocBuilder(),
+        child: AddMedicineViewBodyBlocBuilder(medicine: medicine),
       ),
     );
   }

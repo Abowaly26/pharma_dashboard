@@ -37,6 +37,12 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Moved the logic inside the build method to avoid creating new objects on every rebuild
+    final effectiveInputFormatters =
+        inputFormatters ?? _getDefaultFormatters(textInputType);
+    final effectiveValidator =
+        validator ?? _getDefaultValidator(textInputType, validator);
+
     return Column(
       children: [
         lable == null
@@ -52,8 +58,8 @@ class CustomTextField extends StatelessWidget {
           controller: controller,
           keyboardType: textInputType,
           onSaved: onSaved,
-          inputFormatters: inputFormatters ?? _getDefaultFormatters(),
-          validator: validator ?? _getDefaultValidator(),
+          inputFormatters: effectiveInputFormatters,
+          validator: effectiveValidator,
           decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.r),
@@ -92,7 +98,7 @@ class CustomTextField extends StatelessWidget {
   }
 
   // Helper method to get appropriate formatters based on input type
-  List<TextInputFormatter>? _getDefaultFormatters() {
+  List<TextInputFormatter>? _getDefaultFormatters(TextInputType textInputType) {
     if (textInputType == TextInputType.number) {
       return [FilteringTextInputFormatter.digitsOnly];
     }
@@ -100,8 +106,11 @@ class CustomTextField extends StatelessWidget {
   }
 
   // Default validator based on field type
-  String? Function(String?)? _getDefaultValidator() {
-    if (validator != null) return validator;
+  String? Function(String?)? _getDefaultValidator(
+    TextInputType textInputType,
+    String? Function(String?)? customValidator,
+  ) {
+    if (customValidator != null) return customValidator;
 
     // If no custom validator is provided, create a basic one based on the input type
     if (textInputType == TextInputType.number) {

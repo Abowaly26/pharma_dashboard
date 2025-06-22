@@ -1,25 +1,19 @@
 import 'package:pharma_dashboard/features/add_medicine/domain/entities/review_entity.dart';
 
-class ReviewModel {
-  final String name;
-  final String image;
-  final num ratting;
-  final String date;
-  final String reviewDescription;
-
+class ReviewModel extends ReviewEntity {
   ReviewModel({
-    required this.name,
-    required this.image,
-    required this.ratting,
-    required this.date,
-    required this.reviewDescription,
+    required super.name,
+    required super.image,
+    required super.rating,
+    required super.date,
+    required super.reviewDescription,
   });
 
   factory ReviewModel.fromEntity(ReviewEntity reviewEntity) {
     return ReviewModel(
       name: reviewEntity.name,
       image: reviewEntity.image,
-      ratting: reviewEntity.rating,
+      rating: reviewEntity.rating,
       date: reviewEntity.date,
       reviewDescription: reviewEntity.reviewDescription,
     );
@@ -27,11 +21,11 @@ class ReviewModel {
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
     return ReviewModel(
-      name: json['name'],
-      image: json['image'],
-      ratting: json['rating'],
-      date: json['date'],
-      reviewDescription: json['reviewDescription'],
+      name: json['name'] ?? 'Anonymous',
+      image: json['image'] ?? '',
+      rating: json['rating'] ?? 0.0,
+      date: json['date'] ?? '',
+      reviewDescription: json['reviewDescription'] ?? 'No review',
     );
   }
 
@@ -39,7 +33,7 @@ class ReviewModel {
     return {
       'name': name,
       'image': image,
-      'ratting': ratting,
+      'rating': rating,
       'date': date,
       'reviewDescription': reviewDescription,
     };

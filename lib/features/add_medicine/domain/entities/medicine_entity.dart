@@ -3,23 +3,25 @@ import 'dart:io';
 import 'package:pharma_dashboard/features/add_medicine/domain/entities/review_entity.dart';
 
 class MedicineEntity {
+  late final String id;
   final String name;
   final String description;
   final String code;
   final int quantity;
   final bool isNewProduct;
-  final File image;
+  final File? image;
   final num price;
   String? subabaseORImageUrl;
   final String pharmacyName;
   final int pharmacyId;
   final String pharmcyAddress;
-  final num avgRating = 0;
-  final int ratingCount = 0;
+  final num avgRating;
+  final int ratingCount;
   final List<ReviewEntity> reviews;
   final int discountRating;
 
   MedicineEntity({
+    required this.id,
     required this.discountRating,
     required this.reviews,
     required this.pharmacyName,
@@ -31,8 +33,9 @@ class MedicineEntity {
     required this.code,
     required this.quantity,
     required this.isNewProduct,
-    required this.image,
+    this.image,
     required this.price,
-    required String pharmacyAddress,
+    this.avgRating = 0,
+    this.ratingCount = 0,
   });
 }

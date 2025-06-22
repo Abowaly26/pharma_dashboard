@@ -4,10 +4,12 @@ import 'package:pharma_dashboard/core/helper_functions.dart/build_error_bar.dart
 import 'package:pharma_dashboard/core/widgets/custom_progress_hud.dart';
 import 'package:pharma_dashboard/features/add_medicine/presentation/manager/products_cubit/add_medicine_cubit.dart';
 
+import '../../../domain/entities/medicine_entity.dart';
 import 'add_medicine_view_body.dart';
 
 class AddMedicineViewBodyBlocBuilder extends StatelessWidget {
-  const AddMedicineViewBodyBlocBuilder({super.key});
+  const AddMedicineViewBodyBlocBuilder({super.key, this.medicine});
+  final MedicineEntity? medicine;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class AddMedicineViewBodyBlocBuilder extends StatelessWidget {
       builder: (context, state) {
         return CustomProgressHud(
           isLoading: state is AddMedicineLoading,
-          child: const AddMedicineViewBody(),
+          child: AddMedicineViewBody(medicine: medicine),
         ); // (child: const AddMedicineViewBody());
       },
     );

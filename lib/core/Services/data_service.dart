@@ -6,12 +6,14 @@ abstract class DatabaseService {
   });
   Future<dynamic> getData({
     required String path,
-    String? docuementId,
+    String? documentId,
     Map<String, dynamic>? query,
   });
 
   Future<bool> checkIfDataExists({
     required String path,
-    required String docuementId,
+    required String documentId,
   });
+
+  Future<void> deleteData({required String path, required String documentId});
 }

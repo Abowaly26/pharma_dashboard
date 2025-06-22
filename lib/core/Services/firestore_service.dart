@@ -11,7 +11,7 @@ class FireStoreService implements DatabaseService {
     String? documentId,
   }) async {
     if (documentId != null) {
-      firestore.collection(path).doc(documentId).set(data);
+      await firestore.collection(path).doc(documentId).set(data);
     } else {
       await firestore.collection(path).add(data);
     }
@@ -20,11 +20,11 @@ class FireStoreService implements DatabaseService {
   @override
   Future<dynamic> getData({
     required String path,
-    String? docuementId,
+    String? documentId,
     Map<String, dynamic>? query,
   }) async {
-    if (docuementId != null) {
-      var data = await firestore.collection(path).doc(docuementId).get();
+    if (documentId != null) {
+      var data = await firestore.collection(path).doc(documentId).get();
       return data.data();
     } else {
       Query<Map<String, dynamic>> data = firestore.collection(path);
@@ -40,16 +40,28 @@ class FireStoreService implements DatabaseService {
         }
       }
       var result = await data.get();
-      return result.docs.map((e) => e.data()).toList();
+      return result.docs.map((e) {
+        var data = e.data();
+        data['id'] = e.id;
+        return data;
+      }).toList();
     }
   }
 
   @override
   Future<bool> checkIfDataExists({
     required String path,
-    required String docuementId,
+    required String documentId,
   }) async {
-    var data = await firestore.collection(path).doc(docuementId).get();
+    var data = await firestore.collection(path).doc(documentId).get();
     return data.exists;
+  }
+
+  @override
+  Future<void> deleteData({
+    required String path,
+    required String documentId,
+  }) async {
+    await firestore.collection(path).doc(documentId).delete();
   }
 }

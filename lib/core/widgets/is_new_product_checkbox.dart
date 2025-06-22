@@ -7,15 +7,26 @@ import '../utils/color_manger.dart';
 import '../utils/text_style.dart';
 
 class IsNewMedicineCheckBox extends StatefulWidget {
-  const IsNewMedicineCheckBox({super.key, required this.onChanged});
+  const IsNewMedicineCheckBox({
+    super.key,
+    required this.onChanged,
+    this.initialValue = false,
+  });
 
   final ValueChanged<bool> onChanged;
+  final bool initialValue;
   @override
   State<IsNewMedicineCheckBox> createState() => _IsNewMedicineCheckBoxState();
 }
 
 class _IsNewMedicineCheckBoxState extends State<IsNewMedicineCheckBox> {
-  bool isTermsAccepted = false;
+  late bool isTermsAccepted;
+  @override
+  void initState() {
+    super.initState();
+    isTermsAccepted = widget.initialValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(

@@ -6,6 +6,7 @@ import 'package:pharma_dashboard/features/add_medicine/domain/entities/medicine_
 import '../../../features/add_medicine/data/models/add_medicine_model.dart';
 import '../../errors/failures.dart';
 import '../../utils/backend_endpoint.dart';
+import 'package:flutter/foundation.dart';
 
 class MedicineRepoImpl implements MedicineRepo {
   final DatabaseService databaseService;
@@ -39,6 +40,53 @@ class MedicineRepoImpl implements MedicineRepo {
       return Right(data.length);
     } catch (e) {
       return Left(ServerFailure('Failed to get medicines count'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteMedicine({
+    required String medicineId,
+  }) async {
+    try {
+      await databaseService.deleteData(
+        path: BackendEndpoint.addMedicine,
+        documentId: medicineId,
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure('Failed to delete medicine'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<MedicineEntity>>> getProducts() async {
+    try {
+      final data = await databaseService.getData(
+        path: BackendEndpoint.addMedicine,
+      );
+      final medicines =
+          (data as List).map((e) => AddMedicineModel.fromJson(e)).toList();
+      return Right(medicines);
+    } catch (e, s) {
+      debugPrint('Failed to get medicines: $e');
+      debugPrint(s.toString());
+      return Left(ServerFailure('Failed to get medicines'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateMedicine({
+    required MedicineEntity medicineEntity,
+  }) async {
+    try {
+      await databaseService.addData(
+        path: BackendEndpoint.addMedicine,
+        documentId: medicineEntity.id,
+        data: AddMedicineModel.fromEntity(medicineEntity).toJson(),
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure('Failed to update medicine'));
     }
   }
 }

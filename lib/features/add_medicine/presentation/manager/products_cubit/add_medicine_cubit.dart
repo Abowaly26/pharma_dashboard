@@ -32,8 +32,13 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
         },
       );
     } else {
+      final imageFile = addMedicineInputEntity.image;
+      if (imageFile == null) {
+        emit(AddMedicineFailure('Please select an image'));
+        return;
+      }
       // If there's a local image file, upload it first
-      var result = await imagesRepo.uploadImage(addMedicineInputEntity.image);
+      var result = await imagesRepo.uploadImage(imageFile);
       result.fold(
         (f) {
           emit(AddMedicineFailure(f.message));
@@ -50,6 +55,32 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
             },
           );
         },
+      );
+    }
+  }
+
+  Future<void> updateMedicine(MedicineEntity medicineEntity) async {
+    emit(AddMedicineLoading());
+    final imageFile = medicineEntity.image;
+    if (imageFile != null) {
+      final result = await imagesRepo.uploadImage(imageFile);
+      result.fold((f) => emit(AddMedicineFailure(f.message)), (url) async {
+        medicineEntity.subabaseORImageUrl = url;
+        final result = await medicineRepo.updateMedicine(
+          medicineEntity: medicineEntity,
+        );
+        result.fold(
+          (f) => emit(AddMedicineFailure(f.message)),
+          (r) => emit(AddMedicineSuccess()),
+        );
+      });
+    } else {
+      final result = await medicineRepo.updateMedicine(
+        medicineEntity: medicineEntity,
+      );
+      result.fold(
+        (f) => emit(AddMedicineFailure(f.message)),
+        (r) => emit(AddMedicineSuccess()),
       );
     }
   }

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pharma_dashboard/core/Services/get_it_service.dart';
 import 'package:pharma_dashboard/core/repos/medicine_repo/add_medicine_repo.dart';
 import 'package:pharma_dashboard/features/add_medicine/presentation/views/add_medicine_view.dart';
+import 'package:pharma_dashboard/features/edit_medicine/presentation/view/edit_view.dart';
 
 class DashboardViewBody extends StatefulWidget {
   const DashboardViewBody({super.key});
@@ -219,11 +220,11 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                         title: 'Edit Medicine',
                         subtitle: 'Update product information',
                         color: const Color(0xFF8B5CF6),
-                        onTap: () {},
-                        // () => Navigator.pushNamed(
-                        //   context,
-                        //   EditView.routeName,
-                        // ),
+                        onTap:
+                            () => Navigator.pushNamed(
+                              context,
+                              EditView.routeName,
+                            ),
                       ),
                       SizedBox(height: 16.h),
                       _buildActionButton(

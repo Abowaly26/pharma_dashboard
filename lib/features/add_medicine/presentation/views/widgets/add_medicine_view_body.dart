@@ -15,7 +15,8 @@ import '../../../../../core/widgets/custom_text_field.dart';
 import '../../manager/products_cubit/add_medicine_cubit.dart';
 
 class AddMedicineViewBody extends StatefulWidget {
-  const AddMedicineViewBody({super.key});
+  const AddMedicineViewBody({super.key, this.medicine});
+  final MedicineEntity? medicine;
 
   @override
   State<AddMedicineViewBody> createState() => _AddMedicineViewBodyState();
@@ -25,21 +26,69 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
 
-  // Initialize with default values to avoid null issues
-  String? name, code, description;
-  num price = 0;
-  int quantity = 0;
-  bool isNewProduct = false;
-  // Added a new state for discount checkbox
-  bool hasDiscount = false;
-  int discountRating = 0;
+  late final TextEditingController _nameController;
+  late final TextEditingController _priceController;
+  late final TextEditingController _codeController;
+  late final TextEditingController _quantityController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _pharmacyNameController;
+  late final TextEditingController _pharmacyIdController;
+  late final TextEditingController _pharmacyAddressController;
+  late final TextEditingController _discountRatingController;
 
-  // Updated variables to handle both local image and URL
+  bool isNewProduct = false;
+  bool hasDiscount = false;
   File? image;
   String? imageUrl;
 
   int pharmcyId = 0;
   String? pharmcyName, pharmcyAddress;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.medicine?.name);
+    _priceController = TextEditingController(
+      text: widget.medicine?.price.toString(),
+    );
+    _codeController = TextEditingController(text: widget.medicine?.code);
+    _quantityController = TextEditingController(
+      text: widget.medicine?.quantity.toString(),
+    );
+    _descriptionController = TextEditingController(
+      text: widget.medicine?.description,
+    );
+    _pharmacyNameController = TextEditingController(
+      text: widget.medicine?.pharmacyName,
+    );
+    _pharmacyIdController = TextEditingController(
+      text: widget.medicine?.pharmacyId.toString(),
+    );
+    _pharmacyAddressController = TextEditingController(
+      text: widget.medicine?.pharmcyAddress,
+    );
+    _discountRatingController = TextEditingController(
+      text: widget.medicine?.discountRating.toString(),
+    );
+
+    isNewProduct = widget.medicine?.isNewProduct ?? false;
+    hasDiscount = (widget.medicine?.discountRating ?? 0) > 0;
+    imageUrl = widget.medicine?.subabaseORImageUrl;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _codeController.dispose();
+    _quantityController.dispose();
+    _descriptionController.dispose();
+    _pharmacyNameController.dispose();
+    _pharmacyIdController.dispose();
+    _pharmacyAddressController.dispose();
+    _discountRatingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +101,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
           child: Column(
             children: [
               CustomTextField(
-                onSaved: (value) {
-                  name = value;
-                },
+                controller: _nameController,
                 hint: 'Medicine Name',
                 textInputType: TextInputType.text,
                 validator: (value) {
@@ -66,11 +113,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               ),
               SizedBox(height: 16.h),
               CustomTextField(
-                onSaved: (value) {
-                  if (value != null && value.isNotEmpty) {
-                    price = num.tryParse(value) ?? 0;
-                  }
-                },
+                controller: _priceController,
                 hint: 'Medicine Price',
                 textInputType: TextInputType.number,
                 inputFormatters: [
@@ -89,9 +132,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               SizedBox(height: 16.h),
 
               CustomTextField(
-                onSaved: (value) {
-                  code = value!.toLowerCase();
-                },
+                controller: _codeController,
                 hint: 'Medicine Code',
                 textInputType: TextInputType.text,
                 validator: (value) {
@@ -103,11 +144,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               ),
               SizedBox(height: 16.h),
               CustomTextField(
-                onSaved: (value) {
-                  if (value != null && value.isNotEmpty) {
-                    quantity = int.tryParse(value) ?? 0;
-                  }
-                },
+                controller: _quantityController,
                 hint: 'Medicine Quantity',
                 textInputType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -123,28 +160,20 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               ),
               SizedBox(height: 16.h),
               CustomTextField(
-                onSaved: (value) {
-                  description = value;
-                },
+                controller: _descriptionController,
                 hint: 'Product Description',
                 textInputType: TextInputType.text,
                 maxLines: 5,
               ),
               SizedBox(height: 16.h),
               CustomTextField(
-                onSaved: (value) {
-                  pharmcyName = value;
-                },
+                controller: _pharmacyNameController,
                 hint: 'Pharmacy Name',
                 textInputType: TextInputType.text,
               ),
               SizedBox(height: 16.h),
               CustomTextField(
-                onSaved: (value) {
-                  if (value != null && value.isNotEmpty) {
-                    pharmcyId = int.tryParse(value) ?? 0;
-                  }
-                },
+                controller: _pharmacyIdController,
                 hint: 'Pharmacy ID',
                 textInputType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -160,9 +189,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               ),
               SizedBox(height: 16.h),
               CustomTextField(
-                onSaved: (value) {
-                  pharmcyAddress = value;
-                },
+                controller: _pharmacyAddressController,
                 hint: 'Pharmacy Address',
                 textInputType: TextInputType.text,
               ),
@@ -175,7 +202,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                     hasDiscount = value;
                     // Reset discount rating if checkbox is unchecked
                     if (!value) {
-                      discountRating = 0;
+                      _discountRatingController.text = '0';
                     }
                   });
                 },
@@ -185,11 +212,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               if (hasDiscount) ...[
                 SizedBox(height: 16.h),
                 CustomTextField(
-                  onSaved: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      discountRating = int.tryParse(value) ?? 0;
-                    }
-                  },
+                  controller: _discountRatingController,
                   hint: 'Discount Rate (1-100)',
                   textInputType: TextInputType.number,
                   inputFormatters: [
@@ -228,14 +251,18 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
 
               SizedBox(height: 16.h),
               IsNewMedicineCheckBox(
+                initialValue: isNewProduct,
                 onChanged: (value) {
-                  isNewProduct = value;
+                  setState(() {
+                    isNewProduct = value;
+                  });
                 },
               ),
               SizedBox(height: 16.h),
 
               // Enhanced image field
               EnhancedImageField(
+                initialUrl: imageUrl,
                 onFileChanged: (file) {
                   setState(() {
                     image = file;
@@ -248,8 +275,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                 onUrlChanged: (url) {
                   setState(() {
                     imageUrl = url;
-                    // When entering a URL, clear the image file
-                    if (url != null) {
+                    if (url != null && url.isNotEmpty) {
                       image = null;
                     }
                   });
@@ -258,10 +284,49 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               SizedBox(height: 24.h),
               ElevatedButton(
                 style: ButtonStyles.primaryButton,
-                onPressed: _submitForm,
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    final medicineEntity = MedicineEntity(
+                      id:
+                          widget.medicine?.id ??
+                          '', // Use existing id or generate new one for new product
+                      name: _nameController.text,
+                      description: _descriptionController.text,
+                      code: _codeController.text,
+                      quantity: int.parse(_quantityController.text),
+                      isNewProduct: isNewProduct,
+                      price: num.parse(_priceController.text),
+                      pharmacyName: _pharmacyNameController.text,
+                      pharmacyId: int.parse(_pharmacyIdController.text),
+                      pharmcyAddress: _pharmacyAddressController.text,
+                      discountRating:
+                          int.tryParse(_discountRatingController.text) ?? 0,
+                      image: image,
+                      subabaseORImageUrl: imageUrl,
+                      reviews: widget.medicine?.reviews ?? [],
+                    );
+                    if (widget.medicine == null) {
+                      context.read<AddMedicineCubit>().addMedicine(
+                        medicineEntity,
+                      );
+                    } else {
+                      context.read<AddMedicineCubit>().updateMedicine(
+                        medicineEntity,
+                      );
+                    }
+                  } else {
+                    setState(() {
+                      _autoValidateMode = AutovalidateMode.always;
+                    });
+                  }
+                },
                 child: Text(
-                  'Add Medicine',
-                  style: TextStyle(color: ColorManager.primaryColor),
+                  widget.medicine == null ? 'Add Medicine' : 'Update Medicine',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -269,58 +334,5 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
         ),
       ),
     );
-  }
-
-  void _submitForm() {
-    // Check if either an image file or URL is provided
-    if (image == null && (imageUrl == null || imageUrl!.isEmpty)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select an image or enter an image URL'),
-        ),
-      );
-      return;
-    }
-
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-
-      // Use discountRating only if hasDiscount is true, otherwise set to 0
-      final actualDiscountRating = hasDiscount ? discountRating : 0;
-
-      final MedicineEntity input = MedicineEntity(
-        reviews: [
-          ReviewEntity(
-            name: 'John Doe',
-            date: DateTime.now().toIso8601String(),
-            rating: 4,
-            reviewDescription: 'Good product',
-            image:
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQet2xOmvH86IcD05zovfeZJo19fgbgfrgi8g&s',
-          ),
-        ],
-        discountRating: actualDiscountRating,
-        name: name!,
-        description: description!,
-        code: code!,
-        quantity: quantity,
-        isNewProduct: isNewProduct,
-        // Use empty file if we only have URL
-        image: image ?? File(''),
-        // Add image URL if available
-        subabaseORImageUrl: imageUrl,
-        price: price,
-        pharmacyName: pharmcyName ?? '',
-        pharmacyAddress: pharmcyAddress ?? '',
-        pharmacyId: pharmcyId,
-        pharmcyAddress: pharmcyAddress ?? '',
-      );
-
-      context.read<AddMedicineCubit>().addMedicine(input);
-    } else {
-      setState(() {
-        _autoValidateMode = AutovalidateMode.always;
-      });
-    }
   }
 }
