@@ -111,17 +111,17 @@ class _EditViewItemState extends State<EditViewItem>
               curve: Curves.easeInOut,
               margin: EdgeInsets.symmetric(horizontal: 2.w),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(18.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 12.r,
-                    offset: Offset(0, 4.h),
+                    color: Colors.black.withOpacity(0.10),
+                    blurRadius: 16.r,
+                    offset: Offset(0, 6.h),
                     spreadRadius: 0,
                   ),
                   BoxShadow(
                     color: Colors.black.withOpacity(0.04),
-                    blurRadius: 6.r,
+                    blurRadius: 8.r,
                     offset: Offset(0, 2.h),
                     spreadRadius: 0,
                   ),
@@ -130,7 +130,7 @@ class _EditViewItemState extends State<EditViewItem>
               child: Card(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.r),
+                  borderRadius: BorderRadius.circular(18.r),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Container(
@@ -202,8 +202,8 @@ class _EditViewItemState extends State<EditViewItem>
                   end: Alignment.bottomRight,
                 ),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16.r),
-          bottomLeft: Radius.circular(16.r),
+          topLeft: Radius.circular(18.r),
+          bottomLeft: Radius.circular(18.r),
         ),
       ),
       child: Stack(
@@ -272,8 +272,8 @@ class _EditViewItemState extends State<EditViewItem>
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyles.listView_product_name.copyWith(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
                   color:
                       _error != null ? Colors.red : ColorManager.textInputColor,
                   height: 1.2,

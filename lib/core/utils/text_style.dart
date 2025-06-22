@@ -35,7 +35,7 @@ class TextStyles {
 
   static TextStyle inputLabel16 = TextStyle(
     color: ColorManager.blackColor,
-    fontSize: 16.sp,
+    fontSize: 11.sp,
     fontFamily: 'Inter',
     fontWeight: FontWeight.normal,
   );

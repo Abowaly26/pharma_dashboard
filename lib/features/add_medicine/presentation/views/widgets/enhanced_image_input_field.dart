@@ -41,17 +41,30 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
   }
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-        _isUrlMode = false;
-        _urlController.clear();
-      });
-      widget.onFileChanged(_selectedImage);
-      widget.onUrlChanged(null);
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+          _isUrlMode = false;
+          _urlController.clear();
+        });
+        widget.onFileChanged(_selectedImage);
+        widget.onUrlChanged(null);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'An error occurred while picking the image. Please check permissions and try again.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

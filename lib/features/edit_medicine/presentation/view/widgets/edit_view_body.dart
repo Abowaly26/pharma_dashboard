@@ -313,11 +313,18 @@ class _EditViewBodyState extends State<EditViewBody> {
     int outOfStock = medicines.where((m) => m.quantity <= 0).length;
 
     return Container(
-      padding: EdgeInsets.all(12.r),
+      padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-        color: ColorManager.buttom_info,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: ColorManager.lightBlueColorF5C),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.12),
+            spreadRadius: 2,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -370,9 +377,16 @@ class _EditViewBodyState extends State<EditViewBody> {
     return Container(
       height: 48.h,
       decoration: BoxDecoration(
-        color: ColorManager.buttom_info,
+        color: Colors.grey[100],
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(color: ColorManager.lightBlueColorF5C),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.08),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: TextField(
         controller: _searchController,
@@ -450,6 +464,13 @@ class _EditViewBodyState extends State<EditViewBody> {
               decoration: BoxDecoration(
                 color: iconColor.withOpacity(0.1),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: iconColor.withOpacity(0.08),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
               child: Icon(icon, size: 60.sp, color: iconColor),
             ),
@@ -521,12 +542,12 @@ class _EditViewBodyState extends State<EditViewBody> {
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(
                     horizontal: 24.w,
-                    vertical: 12.h,
+                    vertical: 16.h,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
-                  elevation: 2,
+                  elevation: 4,
                 ),
               ),
             ],

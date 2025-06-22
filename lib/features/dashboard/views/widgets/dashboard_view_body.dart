@@ -261,12 +261,12 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(18.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 16,
+            offset: Offset(0, 6),
           ),
         ],
       ),
@@ -279,7 +279,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(icon, color: color, size: 24.sp),
+            child: Icon(icon, color: color, size: 26.sp),
           ),
           SizedBox(height: 12.h),
           Text(
@@ -294,7 +294,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
           Text(
             title,
             style: TextStyle(
-              fontSize: 12.sp,
+              fontSize: 13.sp,
               color: const Color(0xFF6B7280),
               fontWeight: FontWeight.w500,
             ),
@@ -318,9 +318,16 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
       child: Container(
         padding: EdgeInsets.all(20.w),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: color.withOpacity(0.1), width: 1),
+          color: color.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(18.r),
+          border: Border.all(color: color.withOpacity(0.12), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.08),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -330,7 +337,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
-              child: Icon(icon, color: color, size: 24.sp),
+              child: Icon(icon, color: color, size: 26.sp),
             ),
             SizedBox(width: 16.w),
             Expanded(
@@ -340,7 +347,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF1F2937),
                     ),
@@ -349,7 +356,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 13.sp,
                       color: const Color(0xFF6B7280),
                     ),
                   ),

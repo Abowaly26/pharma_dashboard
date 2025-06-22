@@ -22,15 +22,17 @@ class AddMedicineView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorManager.primaryColor,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(48.sp),
-        child: PharmaAppBar(
-          title: medicine == null ? 'Add Medicine' : 'Edit Medicine',
-          isBack: true,
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, DashboardView.routeName);
-          },
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          'Manage Inventory',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        backgroundColor: const Color(0xFF667EEA),
       ),
       body: BlocProvider(
         create:
