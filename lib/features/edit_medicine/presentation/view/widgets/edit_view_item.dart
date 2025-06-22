@@ -335,8 +335,8 @@ class _EditViewItemState extends State<EditViewItem>
 
     return Text(
       widget.medicine.description ?? 'Medicine product',
-      maxLines: _isExpanded ? null : 2,
-      overflow: _isExpanded ? null : TextOverflow.ellipsis,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
         fontSize: 12.sp,
         color: ColorManager.greyColor,
@@ -379,7 +379,7 @@ class _EditViewItemState extends State<EditViewItem>
         ),
         SizedBox(width: 2.w),
         Text(
-          '${widget.medicine.quantity}',
+          'Qty:${widget.medicine.quantity}',
           style: TextStyle(
             fontSize: 12.sp,
             fontWeight: FontWeight.w600,
@@ -449,7 +449,7 @@ class _EditViewItemState extends State<EditViewItem>
           SizedBox(height: 8.h),
           _buildInfoRow(
             'Discount',
-            '${widget.medicine.discountRating.toStringAsFixed(0)} EGP',
+            '${widget.medicine.discountRating.toStringAsFixed(0)} %',
           ),
         ],
       ],
@@ -614,8 +614,8 @@ class _EditViewItemState extends State<EditViewItem>
       ),
       child: Icon(
         _isExpanded ? Icons.expand_less : Icons.expand_more,
-        size: 16.sp,
-        color: ColorManager.primaryColor,
+        size: 18.sp,
+        color: ColorManager.secondaryColor,
       ),
     );
   }
