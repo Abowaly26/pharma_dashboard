@@ -21,6 +21,7 @@ class CustomTextField extends StatelessWidget {
     String? title,
     this.maxLines,
     this.inputFormatters,
+    this.readOnly = false,
   });
 
   final String? lable;
@@ -34,6 +35,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final int? maxLines;
   final List<TextInputFormatter>? inputFormatters;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +55,7 @@ class CustomTextField extends StatelessWidget {
             ),
         SizedBox(height: 8.h),
         TextFormField(
+          readOnly: readOnly,
           maxLines: maxLines,
           obscureText: obscureText,
           controller: controller,

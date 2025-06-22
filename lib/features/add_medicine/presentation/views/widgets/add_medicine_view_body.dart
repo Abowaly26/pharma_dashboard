@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -75,6 +76,12 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
     isNewProduct = widget.medicine?.isNewProduct ?? false;
     hasDiscount = (widget.medicine?.discountRating ?? 0) > 0;
     imageUrl = widget.medicine?.subabaseORImageUrl;
+
+    if (widget.medicine == null) {
+      _codeController.text = (100000 + Random().nextInt(900000)).toString();
+      _pharmacyIdController.text =
+          (100000 + Random().nextInt(900000)).toString();
+    }
   }
 
   @override
@@ -184,7 +191,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                     CustomTextField(
                       lable: 'Medicine Name',
                       controller: _nameController,
-                      hint: 'e.g. Paracetamol',
+                      hint: 'Enter the medicine\'s commercial name',
                       textInputType: TextInputType.text,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -200,11 +207,11 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                     Row(
                       children: [
                         Expanded(
-                          flex: 2,
+                          flex: 3,
                           child: CustomTextField(
-                            lable: 'Price (\$)',
+                            lable: 'Price ',
                             controller: _priceController,
-                            hint: 'e.g. 12.50',
+                            hint: 'Price',
                             textInputType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
@@ -231,7 +238,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                           child: CustomTextField(
                             lable: 'Quantity',
                             controller: _quantityController,
-                            hint: 'e.g. 100',
+                            hint: 'Qty',
                             textInputType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
@@ -254,26 +261,16 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                       ],
                     ),
                     SizedBox(height: 16.h),
-                    CustomTextField(
-                      lable: 'Medicine Code',
-                      controller: _codeController,
-                      hint: 'e.g. MED001',
-                      textInputType: TextInputType.text,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Medicine code is required';
-                        }
-                        if (value.length < 3) {
-                          return 'Medicine code must be at least 3 characters';
-                        }
-                        return null;
-                      },
+                    _buildIdDisplay(
+                      label: 'Medicine Code',
+                      value: _codeController.text,
+                      icon: Icons.qr_code_2_outlined,
                     ),
                     SizedBox(height: 16.h),
                     CustomTextField(
                       lable: 'Product Description',
                       controller: _descriptionController,
-                      hint: 'Short description...',
+                      hint: 'Describe the medicine and its uses',
                       textInputType: TextInputType.multiline,
                       maxLines: 4,
                     ),
@@ -292,31 +289,20 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                     CustomTextField(
                       lable: 'Pharmacy Name',
                       controller: _pharmacyNameController,
-                      hint: 'e.g. Al Shifa Pharmacy',
+                      hint: 'Name of the providing pharmacy',
                       textInputType: TextInputType.text,
                     ),
                     SizedBox(height: 16.h),
-                    CustomTextField(
-                      lable: 'Pharmacy ID',
-                      controller: _pharmacyIdController,
-                      hint: 'e.g. 123',
-                      textInputType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Pharmacy ID is required';
-                        }
-                        if (int.tryParse(value) == null) {
-                          return 'Enter a valid pharmacy ID';
-                        }
-                        return null;
-                      },
+                    _buildIdDisplay(
+                      label: 'Pharmacy ID',
+                      value: _pharmacyIdController.text,
+                      icon: Icons.store_outlined,
                     ),
                     SizedBox(height: 16.h),
                     CustomTextField(
                       lable: 'Pharmacy Address',
                       controller: _pharmacyAddressController,
-                      hint: 'e.g. 123 Main St, City',
+                      hint: 'Full address of the pharmacy',
                       textInputType: TextInputType.multiline,
                       maxLines: 2,
                     ),
@@ -402,7 +388,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                             CustomTextField(
                               lable: 'Discount Rate (%)',
                               controller: _discountRatingController,
-                              hint: 'e.g. 10',
+                              hint: 'Discount percentage (1-100)',
                               textInputType: TextInputType.number,
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
@@ -623,6 +609,58 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildIdDisplay({
+    required String label,
+    required String value,
+    IconData? icon,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: const Color(0xFFE5EAF2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.02),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon ?? Icons.vpn_key,
+            size: 20.sp,
+            color: ColorManager.primaryColor.withOpacity(0.7),
+          ),
+          SizedBox(width: 12.w),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
+            ),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.bold,
+              color: ColorManager.primaryColor,
+              fontFamily: 'monospace',
+              letterSpacing: 1.2,
+            ),
+          ),
+        ],
       ),
     );
   }
