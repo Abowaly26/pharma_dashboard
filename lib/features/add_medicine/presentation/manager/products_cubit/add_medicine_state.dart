@@ -14,7 +14,6 @@ final class AddMedicineFailure extends AddMedicineState {
 }
 
 final class AddMedicineSuccess extends AddMedicineState {
-  // final List<ProductEntity> products;
-
-  // ProductsSuccess(this.products);
+  final MedicineEntity updatedMedicine;
+  AddMedicineSuccess(this.updatedMedicine);
 }

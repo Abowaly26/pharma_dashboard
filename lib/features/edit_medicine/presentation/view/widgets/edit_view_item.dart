@@ -61,7 +61,7 @@ class _EditViewItemState extends State<EditViewItem>
   }
 
   void _validateMedicineData() {
-    if (widget.medicine.quantity <= 0) {
+    if (widget.medicine.quantity < 0) {
       setState(() => _error = 'Invalid quantity');
     } else if (widget.medicine.price <= 0) {
       setState(() => _error = 'Invalid price');
@@ -685,14 +685,17 @@ class _EditViewItemState extends State<EditViewItem>
     );
   }
 
-  void _handleEdit() {
+  void _handleEdit() async {
     if (widget.medicine.id != null) {
-      Navigator.push(
+      final updatedMedicine = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => AddMedicineView(medicine: widget.medicine),
         ),
       );
+      if (updatedMedicine != null && updatedMedicine is MedicineEntity) {
+        context.read<EditMedicineCubit>().updateMedicineInList(updatedMedicine);
+      }
     } else {
       _showErrorSnackBar('Cannot edit: Invalid medicine ID');
     }

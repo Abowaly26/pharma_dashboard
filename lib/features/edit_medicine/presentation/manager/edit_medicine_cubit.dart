@@ -28,4 +28,13 @@ class EditMedicineCubit extends Cubit<EditMedicineState> {
     );
     getMedicines(); // Refetch the list after deletion
   }
+
+  void updateMedicineInList(MedicineEntity updated) {
+    if (state is EditMedicineSuccess) {
+      final current = (state as EditMedicineSuccess).medicines;
+      final newList =
+          current.map((m) => m.id == updated.id ? updated : m).toList();
+      emit(EditMedicineSuccess(newList));
+    }
+  }
 }

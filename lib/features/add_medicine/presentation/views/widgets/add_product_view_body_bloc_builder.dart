@@ -17,7 +17,7 @@ class AddMedicineViewBodyBlocBuilder extends StatelessWidget {
       listener: (context, state) {
         if (state is AddMedicineSuccess) {
           buildBar(context, 'Medicine added successfully');
-          Navigator.pop(context);
+          Navigator.pop(context, state.updatedMedicine);
         }
         if (state is AddMedicineFailure) {
           buildBar(context, state.errMessage);

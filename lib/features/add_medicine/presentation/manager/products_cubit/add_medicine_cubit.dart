@@ -28,7 +28,7 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
           emit(AddMedicineFailure(f.message));
         },
         (r) {
-          emit(AddMedicineSuccess());
+          emit(AddMedicineSuccess(addMedicineInputEntity));
         },
       );
     } else {
@@ -51,7 +51,7 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
               emit(AddMedicineFailure(f.message));
             },
             (r) {
-              emit(AddMedicineSuccess());
+              emit(AddMedicineSuccess(addMedicineInputEntity));
             },
           );
         },
@@ -71,7 +71,7 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
         );
         result.fold(
           (f) => emit(AddMedicineFailure(f.message)),
-          (r) => emit(AddMedicineSuccess()),
+          (r) => emit(AddMedicineSuccess(medicineEntity)),
         );
       });
     } else {
@@ -80,7 +80,7 @@ class AddMedicineCubit extends Cubit<AddMedicineState> {
       );
       result.fold(
         (f) => emit(AddMedicineFailure(f.message)),
-        (r) => emit(AddMedicineSuccess()),
+        (r) => emit(AddMedicineSuccess(medicineEntity)),
       );
     }
   }
