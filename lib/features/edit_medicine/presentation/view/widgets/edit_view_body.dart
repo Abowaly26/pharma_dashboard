@@ -315,16 +315,9 @@ class _EditViewBodyState extends State<EditViewBody> {
     return Container(
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.12),
-            spreadRadius: 2,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: ColorManager.buttom_info,
+        border: Border.all(color: ColorManager.lightBlueColorF5C),
+        borderRadius: BorderRadius.circular(16.r),
       ),
       child: Column(
         children: [

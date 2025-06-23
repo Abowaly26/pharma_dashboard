@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pharma_dashboard/core/helper_functions/success_snackbar.dart';
 import 'package:pharma_dashboard/core/helper_functions.dart/build_error_bar.dart';
 import 'package:pharma_dashboard/core/widgets/custom_progress_hud.dart';
 import 'package:pharma_dashboard/features/add_medicine/presentation/manager/products_cubit/add_medicine_cubit.dart';
@@ -16,7 +17,12 @@ class AddMedicineViewBodyBlocBuilder extends StatelessWidget {
     return BlocConsumer<AddMedicineCubit, AddMedicineState>(
       listener: (context, state) {
         if (state is AddMedicineSuccess) {
-          buildBar(context, 'Medicine added successfully');
+          showSuccessSnackBar(
+            context,
+            medicine == null 
+                ? 'Medicine added successfully' 
+                : 'Medicine updated successfully',
+          );
           Navigator.pop(context, state.updatedMedicine);
         }
         if (state is AddMedicineFailure) {
