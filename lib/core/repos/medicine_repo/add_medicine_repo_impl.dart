@@ -91,6 +91,19 @@ class MedicineRepoImpl implements MedicineRepo {
   }
 
   @override
+  Stream<Either<Failure, int>> getTotalMedicinesCountStream() {
+    try {
+      return databaseService
+          .getDataStream(path: BackendEndpoint.addMedicine)
+          .map((snapshot) {
+            return Right((snapshot as List).length);
+          });
+    } catch (e) {
+      return Stream.value(Left(ServerFailure('Failed to get medicines count')));
+    }
+  }
+
+  @override
   Stream<Either<Failure, int>> getLowStockCount() {
     try {
       return databaseService

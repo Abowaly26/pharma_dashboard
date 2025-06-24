@@ -14,6 +14,7 @@ import 'package:pharma_dashboard/features/add_medicine/presentation/views/widget
 import '../../../../../core/utils/color_manger.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
 import '../../manager/products_cubit/add_medicine_cubit.dart';
+import 'package:flutter/rendering.dart';
 
 class AddMedicineViewBody extends StatefulWidget {
   const AddMedicineViewBody({super.key, this.medicine});
@@ -618,49 +619,65 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
     required String value,
     IconData? icon,
   }) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFE5EAF2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.02),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon ?? Icons.vpn_key,
-            size: 20.sp,
-            color: ColorManager.primaryColor.withOpacity(0.7),
-          ),
-          SizedBox(width: 12.w),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
+    return InkWell(
+      onTap: () {
+        if (value.isNotEmpty) {
+          Clipboard.setData(ClipboardData(text: value));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '$label copied successfully!',
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: ColorManager.greenColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              duration: const Duration(seconds: 2),
             ),
-          ),
-          const Spacer(),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.bold,
-              color: ColorManager.primaryColor,
-              fontFamily: 'monospace',
-              letterSpacing: 1.2,
+          );
+        }
+      },
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: Colors.blue.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon ?? Icons.vpn_key,
+              size: 20.sp,
+              color: ColorManager.primaryColor.withOpacity(0.9),
             ),
-          ),
-        ],
+            SizedBox(width: 12.w),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+              ),
+            ),
+            const Spacer(),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.bold,
+                color: ColorManager.primaryColor,
+                fontFamily: 'monospace',
+                letterSpacing: 1.2,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Icon(Icons.copy_rounded, size: 18.sp, color: Colors.grey[600]),
+          ],
+        ),
       ),
     );
   }

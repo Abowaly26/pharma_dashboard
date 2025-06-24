@@ -1,88 +1,14 @@
+import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pharma_dashboard/core/Services/get_it_service.dart';
+import 'package:pharma_dashboard/core/errors/failures.dart';
 import 'package:pharma_dashboard/core/repos/medicine_repo/add_medicine_repo.dart';
 import 'package:pharma_dashboard/features/add_medicine/presentation/views/add_medicine_view.dart';
 import 'package:pharma_dashboard/features/edit_medicine/presentation/view/edit_view.dart';
 
-class DashboardViewBody extends StatefulWidget {
+class DashboardViewBody extends StatelessWidget {
   const DashboardViewBody({super.key});
-
-  @override
-  State<DashboardViewBody> createState() => _DashboardViewBodyState();
-}
-
-class _DashboardViewBodyState extends State<DashboardViewBody> {
-  int _totalMedicines = 0;
-  int _lowStockCount = 0;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    print('Starting to load data...');
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      await _fetchTotalMedicines();
-      await _fetchLowStockCount();
-      print('All data loaded successfully');
-    } catch (e) {
-      print('Error loading data: $e');
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchLowStockCount() async {
-    final repo = getIt<MedicineRepo>();
-    final result = await repo.getLowStockMedicines();
-
-    if (mounted) {
-      setState(() {
-        result.fold(
-          (failure) {
-            _lowStockCount = 0;
-          },
-          (medicines) {
-            _lowStockCount = medicines.length;
-          },
-        );
-      });
-    }
-  }
-
-  Future<void> _fetchTotalMedicines() async {
-    final repo = getIt<MedicineRepo>();
-    final result = await repo.getTotalMedicinesCount();
-
-    if (mounted) {
-      setState(() {
-        result.fold(
-          (failure) {
-            _totalMedicines = 0;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Failed to load medicines count')),
-            );
-          },
-          (count) {
-            _totalMedicines = count;
-          },
-        );
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,12 +87,48 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildStatCard(
-                          icon: Icons.medication,
-                          title: 'Total Medicines',
-                          value:
-                              _isLoading ? '...' : _totalMedicines.toString(),
-                          color: const Color(0xFF3B82F6),
+                        child: StreamBuilder<dartz.Either<Failure, int>>(
+                          stream:
+                              getIt<MedicineRepo>()
+                                  .getTotalMedicinesCountStream(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return _buildStatCard(
+                                icon: Icons.medication,
+                                title: 'Total Medicines',
+                                value: 'Error',
+                                color: const Color(0xFF3B82F6),
+                              );
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return _buildStatCard(
+                                icon: Icons.medication,
+                                title: 'Total Medicines',
+                                value: '...',
+                                color: const Color(0xFF3B82F6),
+                              );
+                            }
+                            if (!snapshot.hasData) {
+                              return _buildStatCard(
+                                icon: Icons.medication,
+                                title: 'Total Medicines',
+                                value: '0',
+                                color: const Color(0xFF3B82F6),
+                              );
+                            }
+                            final count = snapshot.data!.fold(
+                              (l) => 'Error',
+                              (r) => r.toString(),
+                            );
+
+                            return _buildStatCard(
+                              icon: Icons.medication,
+                              title: 'Total Medicines',
+                              value: count,
+                              color: const Color(0xFF3B82F6),
+                            );
+                          },
                         ),
                       ),
                       SizedBox(width: 16.w),
@@ -178,11 +140,45 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                             //   LowStockView.routeName,
                             // );
                           },
-                          child: _buildStatCard(
-                            icon: Icons.warning_amber_rounded,
-                            title: 'Low Stock',
-                            value: _lowStockCount.toString(),
-                            color: const Color(0xFFF59E0B),
+                          child: StreamBuilder<dartz.Either<Failure, int>>(
+                            stream: getIt<MedicineRepo>().getLowStockCount(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                return _buildStatCard(
+                                  icon: Icons.warning_amber_rounded,
+                                  title: 'Low Stock',
+                                  value: 'Error',
+                                  color: const Color(0xFFF59E0B),
+                                );
+                              }
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return _buildStatCard(
+                                  icon: Icons.warning_amber_rounded,
+                                  title: 'Low Stock',
+                                  value: '...',
+                                  color: const Color(0xFFF59E0B),
+                                );
+                              }
+                              if (!snapshot.hasData) {
+                                return _buildStatCard(
+                                  icon: Icons.warning_amber_rounded,
+                                  title: 'Low Stock',
+                                  value: '0',
+                                  color: const Color(0xFFF59E0B),
+                                );
+                              }
+                              final count = snapshot.data!.fold(
+                                (l) => 'Error',
+                                (r) => r.toString(),
+                              );
+                              return _buildStatCard(
+                                icon: Icons.warning_amber_rounded,
+                                title: 'Low Stock',
+                                value: count,
+                                color: const Color(0xFFF59E0B),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -212,7 +208,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                             () => Navigator.pushNamed(
                               context,
                               AddMedicineView.routeName,
-                            ).then((_) => _loadData()),
+                            ),
                       ),
                       SizedBox(height: 16.h),
                       _buildActionButton(
@@ -258,45 +254,43 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
     required Color color,
   }) {
     return Container(
-      padding: EdgeInsets.all(20.w),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.10),
-            blurRadius: 16,
-            offset: Offset(0, 6),
-          ),
-        ],
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Icon(icon, color: color, size: 26.sp),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.all(8.r),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(icon, color: Colors.white, size: 20.sp),
+              ),
+            ],
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: 16.h),
           Text(
-            value,
+            title,
             style: TextStyle(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1F2937),
+              color: color,
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
-            title,
+            value,
             style: TextStyle(
-              fontSize: 13.sp,
-              color: const Color(0xFF6B7280),
-              fontWeight: FontWeight.w500,
+              color: const Color(0xFF1F2937),
+              fontSize: 22.sp,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
@@ -312,20 +306,19 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16.r),
       child: Container(
-        padding: EdgeInsets.all(20.w),
+        padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(18.r),
-          border: Border.all(color: color.withOpacity(0.12), width: 1),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.08),
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 2,
               blurRadius: 10,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -334,10 +327,10 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
             Container(
               padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12.r),
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(15.r),
               ),
-              child: Icon(icon, color: color, size: 26.sp),
+              child: Icon(icon, color: color, size: 28.sp),
             ),
             SizedBox(width: 16.w),
             Expanded(
@@ -347,7 +340,7 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF1F2937),
                     ),
@@ -356,14 +349,14 @@ class _DashboardViewBodyState extends State<DashboardViewBody> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 13.sp,
+                      fontSize: 14.sp,
                       color: const Color(0xFF6B7280),
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: color, size: 16.sp),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 18.sp),
           ],
         ),
       ),
