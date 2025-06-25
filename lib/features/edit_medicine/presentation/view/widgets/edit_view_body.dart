@@ -23,6 +23,7 @@ class _EditViewBodyState extends State<EditViewBody> {
   String _selectedFilter = 'All';
   bool _isSearching = false;
   List<MedicineEntity> _filteredMedicines = [];
+  bool _hasSearched = false; //
 
   final List<String> _filterOptions = [
     'All',
@@ -48,6 +49,7 @@ class _EditViewBodyState extends State<EditViewBody> {
     setState(() {
       _searchQuery = _searchController.text.toLowerCase();
       _isSearching = _searchQuery.isNotEmpty;
+      _hasSearched = _searchQuery.isNotEmpty;
     });
   }
 
@@ -96,6 +98,17 @@ class _EditViewBodyState extends State<EditViewBody> {
       _searchController.clear();
       _searchQuery = '';
       _isSearching = false;
+      _hasSearched = false;
+    });
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _searchController.clear();
+      _searchQuery = '';
+      _isSearching = false;
+      _hasSearched = false;
+      _selectedFilter = 'All';
     });
   }
 
@@ -176,12 +189,16 @@ class _EditViewBodyState extends State<EditViewBody> {
   }
 
   Widget _buildSuccessState(BuildContext context, EditMedicineSuccess state) {
-    if (_filteredMedicines.isEmpty &&
-        (_isSearching || _selectedFilter != 'All')) {
-      return _buildEmptyState(isSearchResult: true);
+    // تحقق من وجود نتائج بعد البحث/الفلتر
+    bool hasResults = _filteredMedicines.isNotEmpty;
+    bool isFiltering = _isSearching || _selectedFilter != 'All';
+
+    if (!hasResults && isFiltering) {
+      return _buildEmptySearchState(context, state);
     }
+
     if (state.medicines.isEmpty) {
-      return _buildEmptyState(isSearchResult: false);
+      return _buildEmptyInventoryState(context);
     }
 
     return RefreshIndicator(
@@ -215,7 +232,9 @@ class _EditViewBodyState extends State<EditViewBody> {
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            '${state.medicines.length} items',
+                            isFiltering
+                                ? '${_filteredMedicines.length} of ${state.medicines.length} items'
+                                : '${state.medicines.length} items',
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: ColorManager.greyColor,
@@ -231,13 +250,20 @@ class _EditViewBodyState extends State<EditViewBody> {
                   _buildSearchAndFilter(),
                   SizedBox(height: 12.h),
                   _buildFilterChips(),
+
+                  // إضافة شريط معلومات عن النتائج المصفاة
+                  if (isFiltering) ...[
+                    SizedBox(height: 12.h),
+                    _buildFilterInfoBar(),
+                  ],
+                  SizedBox(height: 4.h),
                 ],
               ),
             ),
           ),
 
           // Medicine list
-          if (_filteredMedicines.isNotEmpty)
+          if (hasResults)
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               sliver: SliverList(
@@ -260,6 +286,266 @@ class _EditViewBodyState extends State<EditViewBody> {
           // Bottom spacing
           SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFilterInfoBar() {
+    String filterText = '';
+    if (_isSearching && _selectedFilter != 'All') {
+      filterText = 'Search: "$_searchQuery" • Filter: $_selectedFilter';
+    } else if (_isSearching) {
+      filterText = 'Search: "$_searchQuery"';
+    } else if (_selectedFilter != 'All') {
+      filterText = 'Filter: $_selectedFilter';
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: ColorManager.buttom_info,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: ColorManager.lightBlueColorF5C),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline, size: 16.sp, color: Color(0xFF667EEA)),
+              SizedBox(width: 8.w),
+              Expanded(
+                child: Text(
+                  filterText,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: ColorManager.textInputColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 4.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: _resetFilters,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF667EEA),
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                  child: Text(
+                    'Clear',
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptySearchState(
+    BuildContext context,
+    EditMedicineSuccess state,
+  ) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<EditMedicineCubit>().getMedicines();
+      },
+      color: ColorManager.secondaryColor,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          // Header section (نفس الهيدر)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Medicine Inventory',
+                            style: TextStyles.listView_product_name.copyWith(
+                              fontSize: 22.sp,
+                              fontWeight: FontWeight.bold,
+                              color: ColorManager.textInputColor,
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            '0 of ${state.medicines.length} items',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: ColorManager.greyColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      _buildQuickStatsCard(state.medicines),
+                    ],
+                  ),
+                  SizedBox(height: 20.h),
+                  _buildSearchAndFilter(),
+                  SizedBox(height: 12.h),
+                  _buildFilterChips(),
+                  SizedBox(height: 12.h),
+                  _buildFilterInfoBar(),
+                ],
+              ),
+            ),
+          ),
+
+          // Empty state في نفس الصفحة
+          SliverFillRemaining(
+            hasScrollBody: true,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: _buildEmptyResultsContent(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyResultsContent() {
+    String title;
+    String message;
+    IconData icon;
+    Color iconColor;
+
+    if (_isSearching && _selectedFilter != 'All') {
+      title = 'No Matching Results';
+      message =
+          'No medicines match your search "$_searchQuery" and filter "$_selectedFilter"';
+      icon = Icons.search_off;
+      iconColor = Colors.orange;
+    } else if (_isSearching) {
+      title = 'No Search Results';
+      message = 'No medicines found for "$_searchQuery"';
+      icon = Icons.search_off;
+      iconColor = Colors.orange;
+    } else {
+      title = 'No Filtered Results';
+      message = 'No medicines match the "$_selectedFilter" filter';
+      icon = Icons.filter_alt_off;
+      iconColor = Colors.blue;
+    }
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(32.r),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 120.w,
+              height: 120.h,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: iconColor.withOpacity(0.08),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(icon, size: 60.sp, color: iconColor),
+            ),
+            SizedBox(height: 24.h),
+            Text(
+              title,
+              style: TextStyles.listView_product_name.copyWith(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color: ColorManager.textInputColor,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: ColorManager.greyColor,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // حالة المخزن الفارغ تماماً
+  Widget _buildEmptyInventoryState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(32.r),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 120.w,
+              height: 120.h,
+              decoration: BoxDecoration(
+                color: ColorManager.secondaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorManager.secondaryColor.withOpacity(0.08),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.medical_services_outlined,
+                size: 60.sp,
+                color: ColorManager.secondaryColor,
+              ),
+            ),
+            SizedBox(height: 24.h),
+            Text(
+              'No Medicines Yet',
+              style: TextStyles.listView_product_name.copyWith(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+                color: ColorManager.textInputColor,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Your inventory is empty. Add your first medicine to get started.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: ColorManager.greyColor,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -413,144 +699,8 @@ class _EditViewBodyState extends State<EditViewBody> {
     );
   }
 
-  Widget _buildEmptyState({required bool isSearchResult}) {
-    String title;
-    String message;
-    IconData icon;
-    Color iconColor;
-
-    if (isSearchResult) {
-      if (_isSearching && _selectedFilter != 'All') {
-        title = 'No Matching Results';
-        message =
-            'No medicines match your search "$_searchQuery" and filter "$_selectedFilter"';
-        icon = Icons.search_off;
-        iconColor = Colors.orange;
-      } else if (_isSearching) {
-        title = 'No Search Results';
-        message = 'No medicines found for "$_searchQuery"';
-        icon = Icons.search_off;
-        iconColor = Colors.orange;
-      } else {
-        title = 'No Filtered Results';
-        message = 'No medicines match the "$_selectedFilter" filter';
-        icon = Icons.filter_alt_off;
-        iconColor = Colors.blue;
-      }
-    } else {
-      title = 'No Medicines Yet';
-      message =
-          'Your inventory is empty. Add your first medicine to get started.';
-      icon = Icons.medical_services_outlined;
-      iconColor = ColorManager.primaryColor;
-    }
-
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(32.r),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 120.w,
-              height: 120.h,
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: iconColor.withOpacity(0.08),
-                    blurRadius: 12,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(icon, size: 60.sp, color: iconColor),
-            ),
-            SizedBox(height: 24.h),
-            Text(
-              title,
-              style: TextStyles.listView_product_name.copyWith(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-                color: ColorManager.textInputColor,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: ColorManager.greyColor,
-                height: 1.4,
-              ),
-            ),
-            if (isSearchResult) ...[
-              SizedBox(height: 24.h),
-              ElevatedButton.icon(
-                onPressed: () {
-                  setState(() {
-                    _selectedFilter = 'All';
-                    _clearSearch();
-                  });
-                },
-                icon: Icon(Icons.clear, size: 18.sp),
-                label: Text(
-                  'Clear All Filters',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 12.h,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-            ] else ...[
-              SizedBox(height: 32.h),
-              ElevatedButton.icon(
-                onPressed: () {
-                  // TODO: Navigate to add medicine view
-                },
-                icon: Icon(Icons.add, size: 18.sp),
-                label: Text(
-                  'Add First Medicine',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorManager.primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.w,
-                    vertical: 16.h,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                  ),
-                  elevation: 4,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildErrorState(BuildContext context, String message) {
+    final Color _primaryBlue = const Color(0xFF2563EB);
     return Center(
       child: Padding(
         padding: EdgeInsets.all(32.r),
@@ -592,20 +742,25 @@ class _EditViewBodyState extends State<EditViewBody> {
               },
               icon: Icon(
                 Icons.refresh_rounded,
-                size: 18.sp,
-                color: ColorManager.secondaryColor,
+                size: 20.sp,
+                color: _primaryBlue,
               ),
               label: Text(
                 'Try Again',
-                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorManager.buttom_info,
-                foregroundColor: ColorManager.buttom_info,
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                backgroundColor: _primaryBlue,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
+                elevation: 4,
               ),
             ),
           ],
