@@ -127,6 +127,56 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
     }
   }
 
+  Future<void> _removeBackgroundFromFile() async {
+    if (_selectedImage == null) return;
+    setState(() {
+      _isProcessing = true;
+    });
+    try {
+      final result = await _removeBgService.removeBackgroundFromFile(
+        _selectedImage!,
+      );
+      await result.fold(
+        (errorMsg) async {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+          );
+        },
+        (imageBytes) async {
+          final uploadResult = await _removeBgService.uploadProcessedImage(
+            imageBytes,
+          );
+          uploadResult.fold(
+            (errorMsg) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+              );
+            },
+            (newUrl) {
+              setState(() {
+                _selectedImage = null;
+                _isUrlMode = true;
+                _urlController.text = newUrl;
+              });
+              widget.onFileChanged(null);
+              widget.onUrlChanged(newUrl);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Background removed and new URL is set!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+          );
+        },
+      );
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+
   void _toggleInputMode() {
     setState(() {
       _isUrlMode = !_isUrlMode;
@@ -344,10 +394,42 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
                     ),
                     child: IconButton(
                       onPressed: _removeImage,
-                      icon: Icon(Icons.close, color: Colors.red),
+                      icon: const Icon(Icons.close, color: Colors.red),
                       iconSize: 24, // Increased from 20 to 24
-                      padding: EdgeInsets.all(6), // Increased from 4 to 6
-                      constraints: BoxConstraints(),
+                      padding: const EdgeInsets.all(6), // Increased from 4 to 6
+                      constraints: const BoxConstraints(),
+                    ),
+                  ),
+                ),
+
+              // Remove Background button for picked image
+              if (_selectedImage != null && _removeBgService.isApiConfigured)
+                Positioned(
+                  bottom: 16,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: ElevatedButton.icon(
+                      onPressed:
+                          _isProcessing ? null : _removeBackgroundFromFile,
+                      icon:
+                          _isProcessing
+                              ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Icon(Icons.auto_fix_high),
+                      label: Text(
+                        _isProcessing ? 'Processing...' : 'Remove Background',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorManager.primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
                     ),
                   ),
                 ),

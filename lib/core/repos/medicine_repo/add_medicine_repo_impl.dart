@@ -7,6 +7,7 @@ import '../../../features/add_medicine/data/models/add_medicine_model.dart';
 import '../../errors/failures.dart';
 import '../../utils/backend_endpoint.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pharma_dashboard/core/Services/supabase_storage.dart';
 
 class MedicineRepoImpl implements MedicineRepo {
   final DatabaseService databaseService;
@@ -48,6 +49,31 @@ class MedicineRepoImpl implements MedicineRepo {
     required String medicineId,
   }) async {
     try {
+      // Get all medicines to find the one to delete
+      final allResult = await getProducts();
+      if (allResult.isLeft()) {
+        return Left(ServerFailure('Failed to fetch medicine for deletion'));
+      }
+      final medicines = allResult.getOrElse(() => []);
+      final medicine = medicines.firstWhere(
+        (m) => m.id == medicineId,
+        orElse: () => throw Exception('Medicine not found'),
+      );
+      // Delete image from Supabase if exists
+      if (medicine.subabaseORImageUrl != null &&
+          medicine.subabaseORImageUrl!.isNotEmpty) {
+        final url = medicine.subabaseORImageUrl!;
+        // Extract the path after the bucket domain
+        final uri = Uri.parse(url);
+        final segments = uri.pathSegments;
+        // Find the index of 'Medicines_images' and get the rest as the file path
+        final bucketIndex = segments.indexOf('Medicines_images');
+        if (bucketIndex != -1 && bucketIndex + 1 < segments.length) {
+          final filePath = segments.sublist(bucketIndex + 1).join('/');
+          await SupabaseStorageService().deleteFile(filePath);
+        }
+      }
+      // Delete from database
       await databaseService.deleteData(
         path: BackendEndpoint.addMedicine,
         documentId: medicineId,

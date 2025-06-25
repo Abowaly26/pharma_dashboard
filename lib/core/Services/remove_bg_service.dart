@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
@@ -37,6 +38,36 @@ class RemoveBgService {
       }
     } catch (e) {
       print('Error calling Remove.bg API: $e');
+      return left(
+        'An unexpected error occurred. Please check your connection.',
+      );
+    }
+  }
+
+  Future<Either<String, Uint8List>> removeBackgroundFromFile(File file) async {
+    if (!isApiConfigured) {
+      return left(
+        'API key is not configured. Please contact the administrator.',
+      );
+    }
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(_removeBgUrl));
+      request.headers['X-Api-Key'] = _apiKey;
+      request.files.add(
+        await http.MultipartFile.fromPath('image_file', file.path),
+      );
+      request.fields['size'] = 'auto';
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode == 200) {
+        return right(response.bodyBytes);
+      } else {
+        print('Failed to remove background (file): ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return left('Failed to process image. Please try another image.');
+      }
+    } catch (e) {
+      print('Error calling Remove.bg API (file): $e');
       return left(
         'An unexpected error occurred. Please check your connection.',
       );

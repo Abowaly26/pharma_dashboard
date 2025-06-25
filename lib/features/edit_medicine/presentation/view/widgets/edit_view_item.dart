@@ -166,8 +166,17 @@ class _EditViewItemState extends State<EditViewItem>
   Widget _buildMainContent() {
     return Container(
       height: 140.h,
-      child: Row(
-        children: [_buildImageSection(), Expanded(child: _buildInfoSection())],
+      child: Stack(
+        children: [
+          Row(
+            children: [
+              _buildImageSection(),
+              Expanded(child: _buildInfoSection()),
+            ],
+          ),
+          if (_error == null)
+            Positioned(top: 8, right: 8, child: _buildActionButtons()),
+        ],
       ),
     );
   }
@@ -225,122 +234,152 @@ class _EditViewItemState extends State<EditViewItem>
       return _buildNoImageWidget();
     }
 
+    final isBgRemoved =
+        (widget.medicine.subabaseORImageUrl?.contains('processed_images') ??
+            false);
+    final double memCacheSize = isBgRemoved ? 240.w : 180.w;
     return Padding(
-      padding: EdgeInsets.all(12.r),
+      padding: EdgeInsets.all(isBgRemoved ? 8.r : 12.r),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12.r),
         child: CachedNetworkImage(
           imageUrl: widget.medicine.subabaseORImageUrl ?? '',
-          fit: BoxFit.cover,
+          fit: isBgRemoved ? BoxFit.contain : BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
           placeholder: (context, url) => _buildShimmerLoading(),
           errorWidget: (context, url, error) => _buildErrorWidget(error),
-          memCacheWidth: 140.w.toInt(),
-          memCacheHeight: 140.h.toInt(),
+          memCacheWidth: memCacheSize.toInt(),
+          memCacheHeight: memCacheSize.toInt(),
         ),
       ),
     );
   }
 
   Widget _buildInfoSection() {
-    return Container(
-      height: 180.h,
-      padding: EdgeInsets.only(left: 6.h, right: 6.h, top: 6.h, bottom: 4.h),
+    return Padding(
+      padding: EdgeInsets.only(right: 4.r, top: 4.r, left: 4.r, bottom: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(),
-          SizedBox(height: 8.h),
+          SizedBox(height: 6.h),
           _buildDescription(),
-          const Spacer(),
-          _buildFooter(),
+          Spacer(),
+          Padding(padding: EdgeInsets.only(right: 6.w), child: _buildFooter()),
         ],
       ),
     );
   }
 
   Widget _buildHeader() {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _error ?? widget.medicine.name ?? 'Unknown Medicine',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyles.listView_product_name.copyWith(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
-                  color:
-                      _error != null ? Colors.red : ColorManager.textInputColor,
-                  height: 1.2,
-                ),
-              ),
-              if (_error == null && widget.medicine.code.isNotEmpty)
-                Padding(
-                  padding: EdgeInsets.only(top: 1.h),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 2.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: ColorManager.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6.r),
-                    ),
-                    child: Text(
-                      widget.medicine.code,
-                      style: TextStyle(
-                        fontSize: 10.sp,
-                        color: ColorManager.primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+        Padding(
+          padding: EdgeInsets.only(right: 48.w),
+          child: Text(
+            _error ?? widget.medicine.name ?? 'Unknown Medicine',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyles.listView_product_name.copyWith(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.w700,
+              color: _error != null ? Colors.red : ColorManager.textInputColor,
+              height: 1.2,
+            ),
           ),
         ),
-        if (_error == null) ...[SizedBox(width: 8.w), _buildActionButtons()],
+        if (_error == null && widget.medicine.code.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(top: 1.h),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+              decoration: BoxDecoration(
+                color: ColorManager.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6.r),
+              ),
+              child: Text(
+                widget.medicine.code,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  color: ColorManager.primaryColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
 
   Widget _buildActionButtons() {
-    return Row(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildActionButton(
-          icon: Icons.edit_rounded,
-          color: const Color(0xFF667EEA),
-          onPressed: () => _handleEdit(),
-          tooltip: 'Edit Medicine',
-        ),
-        SizedBox(width: 8.w),
         _buildActionButton(
           icon: Icons.delete_rounded,
           color: const Color(0xFFFF6B6B),
           onPressed: () => _showDeleteConfirmation(),
           tooltip: 'Delete Medicine',
         ),
+        SizedBox(height: 8.h),
+        _buildActionButton(
+          icon: Icons.edit_rounded,
+          color: const Color(0xFF667EEA),
+          onPressed: () => _handleEdit(),
+          tooltip: 'Edit Medicine',
+        ),
       ],
+    );
+    return SizedBox(
+      width: 36.w,
+      height: 68.h,
+      child: Stack(
+        alignment: Alignment.topRight,
+        children: [
+          Positioned(
+            top: 0,
+            right: 0,
+            child: _buildActionButton(
+              icon: Icons.delete_rounded,
+              color: const Color(0xFFFF6B6B),
+              onPressed: () => _showDeleteConfirmation(),
+              tooltip: 'Delete Medicine',
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Opacity(
+              opacity: 0.92,
+              child: _buildActionButton(
+                icon: Icons.edit_rounded,
+                color: const Color(0xFF667EEA),
+                onPressed: () => _handleEdit(),
+                tooltip: 'Edit Medicine',
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildDescription() {
     if (_error != null) return const SizedBox.shrink();
 
-    return Text(
-      widget.medicine.description ?? 'Medicine product',
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      style: TextStyle(
-        fontSize: 12.sp,
-        color: ColorManager.greyColor,
-        height: 1.4,
+    return Padding(
+      padding: EdgeInsets.only(right: 48.w),
+      child: Text(
+        widget.medicine.description ?? 'Medicine product',
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: ColorManager.greyColor,
+          height: 1.4,
+        ),
       ),
     );
   }

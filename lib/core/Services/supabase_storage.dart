@@ -46,4 +46,9 @@ class SupabaseStorageService implements StorageService {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     return publiUrl;
   }
+
+  Future<void> deleteFile(String filePath) async {
+    // filePath should be the path inside the 'Medicines_images' bucket, e.g. 'originals/filename.png' or 'processed_images/uuid.png'
+    await _supabase.client.storage.from('Medicines_images').remove([filePath]);
+  }
 }
