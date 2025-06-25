@@ -269,7 +269,7 @@ class _EditViewBodyState extends State<EditViewBody> {
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   return Padding(
-                    padding: EdgeInsets.only(bottom: 16.h),
+                    padding: EdgeInsets.only(bottom: 8.h),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,

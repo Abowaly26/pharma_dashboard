@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pharma_dashboard/core/services/remove_bg_service.dart';
 import 'package:pharma_dashboard/core/utils/color_manger.dart';
 
 class EnhancedImageField extends StatefulWidget {
@@ -24,6 +25,8 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
   File? _selectedImage;
   final TextEditingController _urlController = TextEditingController();
   bool _isUrlMode = false;
+  bool _isProcessing = false; // To show a loading indicator
+  final RemoveBgService _removeBgService = RemoveBgService();
 
   @override
   void initState() {
@@ -38,6 +41,62 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
   void dispose() {
     _urlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _removeBackground() async {
+    if (_urlController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an image URL first.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    try {
+      final result = await _removeBgService.removeBackgroundFromUrl(
+        _urlController.text,
+      );
+
+      await result.fold(
+        (errorMsg) async {
+          // Failure
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+          );
+        },
+        (imageBytes) async {
+          // Success
+          final uploadResult = await _removeBgService.uploadProcessedImage(
+            imageBytes,
+          );
+
+          uploadResult.fold(
+            (errorMsg) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+              );
+            },
+            (newUrl) {
+              _urlController.text = newUrl;
+              widget.onUrlChanged(newUrl);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Background removed and new URL is set!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+          );
+        },
+      );
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
   }
 
   Future<void> _pickImage() async {
@@ -108,11 +167,14 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
                 color: ColorManager.colorOfArrows,
               ),
             ),
-            Spacer(),
+            const Spacer(),
             TextButton.icon(
               onPressed: _toggleInputMode,
               icon: Icon(_isUrlMode ? Icons.image : Icons.link),
               label: Text(_isUrlMode ? 'Select Image' : 'Enter URL'),
+              style: TextButton.styleFrom(
+                foregroundColor: ColorManager.secondaryColor,
+              ),
             ),
           ],
         ),
@@ -150,6 +212,30 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
                   widget.onUrlChanged(value.isNotEmpty ? value : null);
                 },
               ),
+              const SizedBox(height: 8),
+              if (_urlController.text.isNotEmpty &&
+                  _removeBgService.isApiConfigured)
+                ElevatedButton.icon(
+                  onPressed: _isProcessing ? null : _removeBackground,
+                  icon:
+                      _isProcessing
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Icon(Icons.auto_fix_high),
+                  label: Text(
+                    _isProcessing ? 'Processing...' : 'Remove Background',
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorManager.secondaryColor,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
 
               // Preview for URL mode
               if (_urlController.text.isNotEmpty)
