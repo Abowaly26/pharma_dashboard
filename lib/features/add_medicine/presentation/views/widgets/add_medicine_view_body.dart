@@ -269,7 +269,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
                     ),
                     SizedBox(height: 16.h),
                     CustomTextField(
-                      lable: 'Product Description',
+                      lable: 'Medicine Description',
                       controller: _descriptionController,
                       hint: 'Describe the medicine and its uses',
                       textInputType: TextInputType.multiline,
@@ -651,7 +651,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
           children: [
             Icon(
               icon ?? Icons.vpn_key,
-              size: 20.sp,
+              size: 24.sp,
               color: ColorManager.primaryColor.withOpacity(0.9),
             ),
             SizedBox(width: 12.w),
@@ -660,7 +660,7 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                color: ColorManager.primaryColor.withOpacity(0.75),
               ),
             ),
             const Spacer(),
@@ -675,7 +675,11 @@ class _AddMedicineViewBodyState extends State<AddMedicineViewBody> {
               ),
             ),
             SizedBox(width: 12.w),
-            Icon(Icons.copy_rounded, size: 18.sp, color: Colors.grey[600]),
+            Icon(
+              Icons.copy_rounded,
+              size: 18.sp,
+              color: ColorManager.primaryColor.withOpacity(0.8),
+            ),
           ],
         ),
       ),

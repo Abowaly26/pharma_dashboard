@@ -133,53 +133,45 @@ class DashboardViewBody extends StatelessWidget {
                       ),
                       SizedBox(width: 16.w),
                       Expanded(
-                        child: InkWell(
-                          onTap: () {
-                            // Navigator.pushNamed(
-                            //   context,
-                            //   LowStockView.routeName,
-                            // );
-                          },
-                          child: StreamBuilder<dartz.Either<Failure, int>>(
-                            stream: getIt<MedicineRepo>().getLowStockCount(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                return _buildStatCard(
-                                  icon: Icons.warning_amber_rounded,
-                                  title: 'Low Stock',
-                                  value: 'Error',
-                                  color: const Color(0xFFF59E0B),
-                                );
-                              }
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return _buildStatCard(
-                                  icon: Icons.warning_amber_rounded,
-                                  title: 'Low Stock',
-                                  value: '...',
-                                  color: const Color(0xFFF59E0B),
-                                );
-                              }
-                              if (!snapshot.hasData) {
-                                return _buildStatCard(
-                                  icon: Icons.warning_amber_rounded,
-                                  title: 'Low Stock',
-                                  value: '0',
-                                  color: const Color(0xFFF59E0B),
-                                );
-                              }
-                              final count = snapshot.data!.fold(
-                                (l) => 'Error',
-                                (r) => r.toString(),
-                              );
+                        child: StreamBuilder<dartz.Either<Failure, int>>(
+                          stream: getIt<MedicineRepo>().getLowStockCount(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
                               return _buildStatCard(
                                 icon: Icons.warning_amber_rounded,
                                 title: 'Low Stock',
-                                value: count,
+                                value: 'Error',
                                 color: const Color(0xFFF59E0B),
                               );
-                            },
-                          ),
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return _buildStatCard(
+                                icon: Icons.warning_amber_rounded,
+                                title: 'Low Stock',
+                                value: '...',
+                                color: const Color(0xFFF59E0B),
+                              );
+                            }
+                            if (!snapshot.hasData) {
+                              return _buildStatCard(
+                                icon: Icons.warning_amber_rounded,
+                                title: 'Low Stock',
+                                value: '0',
+                                color: const Color(0xFFF59E0B),
+                              );
+                            }
+                            final count = snapshot.data!.fold(
+                              (l) => 'Error',
+                              (r) => r.toString(),
+                            );
+                            return _buildStatCard(
+                              icon: Icons.warning_amber_rounded,
+                              title: 'Low Stock',
+                              value: count,
+                              color: const Color(0xFFF59E0B),
+                            );
+                          },
                         ),
                       ),
                     ],
