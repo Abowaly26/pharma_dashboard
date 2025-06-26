@@ -8,7 +8,7 @@ import 'package:uuid/uuid.dart';
 
 class RemoveBgService {
   final String _apiKey =
-      'KX9e44LDxHSfkC9xZoz6noxA'; // <-- Important: Add your remove.bg API key here
+      '21xxCmMLCE8KJ8mL1F1UVHnq'; // <-- Important: Add your remove.bg API key here
   final String _removeBgUrl = 'https://api.remove.bg/v1.0/removebg';
 
   bool get isApiConfigured =>
@@ -93,6 +93,34 @@ class RemoveBgService {
     } catch (e) {
       print('Error uploading processed image to Supabase: $e');
       return left('Failed to save the processed image.');
+    }
+  }
+
+  /// Delete image from Supabase storage
+  Future<Either<String, void>> deleteImageFromSupabase(String imageUrl) async {
+    try {
+      final supabase = Supabase.instance.client;
+
+      // Extract the file path from the URL
+      // URL format: https://xxx.supabase.co/storage/v1/object/public/Medicines_images/processed_images/xxx.png
+      final uri = Uri.parse(imageUrl);
+      final pathSegments = uri.pathSegments;
+
+      // Find the index of 'Medicines_images' and get everything after it
+      final medicinesImagesIndex = pathSegments.indexOf('Medicines_images');
+      if (medicinesImagesIndex == -1 ||
+          medicinesImagesIndex == pathSegments.length - 1) {
+        return left('Invalid image URL format');
+      }
+
+      final filePath = pathSegments.sublist(medicinesImagesIndex + 1).join('/');
+
+      await supabase.storage.from('Medicines_images').remove([filePath]);
+
+      return right(null);
+    } catch (e) {
+      print('Error deleting image from Supabase: $e');
+      return left('Failed to delete the image from storage.');
     }
   }
 }

@@ -28,6 +28,9 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
   bool _isProcessing = false; // To show a loading indicator
   final RemoveBgService _removeBgService = RemoveBgService();
 
+  // Track uploaded images to Supabase for potential deletion
+  List<String> _uploadedImages = [];
+
   @override
   void initState() {
     super.initState();
@@ -82,10 +85,15 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
             (newUrl) {
               _urlController.text = newUrl;
               widget.onUrlChanged(newUrl);
+              // Track the uploaded image for potential deletion
+              _uploadedImages.add(newUrl);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Background removed and new URL is set!'),
+                  content: Text(
+                    'Background removed and new URL is set! You can delete this image from storage if not needed.',
+                  ),
                   backgroundColor: Colors.green,
+                  duration: Duration(seconds: 4),
                 ),
               );
             },
@@ -160,10 +168,15 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
               });
               widget.onFileChanged(null);
               widget.onUrlChanged(newUrl);
+              // Track the uploaded image for potential deletion
+              _uploadedImages.add(newUrl);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Background removed and new URL is set!'),
+                  content: Text(
+                    'Background removed and new URL is set! You can delete this image from storage if not needed.',
+                  ),
                   backgroundColor: Colors.green,
+                  duration: Duration(seconds: 4),
                 ),
               );
             },
@@ -184,6 +197,10 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
         _selectedImage = null;
         widget.onFileChanged(null);
       } else {
+        // If switching away from URL mode and there's an uploaded image, offer to delete it
+        if (_uploadedImages.contains(_urlController.text)) {
+          _showDeleteConfirmationDialog(_urlController.text);
+        }
         _urlController.clear();
         widget.onUrlChanged(null);
       }
@@ -193,6 +210,10 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
   void _removeImage() {
     setState(() {
       if (_isUrlMode) {
+        // If removing a URL that was uploaded to Supabase, offer to delete it
+        if (_uploadedImages.contains(_urlController.text)) {
+          _showDeleteConfirmationDialog(_urlController.text);
+        }
         _urlController.clear();
         widget.onUrlChanged(null);
       } else {
@@ -200,6 +221,78 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
         widget.onFileChanged(null);
       }
     });
+  }
+
+  /// Delete image from Supabase storage
+  Future<void> _deleteImageFromSupabase(String imageUrl) async {
+    try {
+      final result = await _removeBgService.deleteImageFromSupabase(imageUrl);
+
+      result.fold(
+        (errorMsg) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+          );
+        },
+        (_) {
+          // Remove from tracked images
+          _uploadedImages.remove(imageUrl);
+          // امسح الصورة من الواجهة إذا كانت هي المعروضة
+          setState(() {
+            if (_urlController.text == imageUrl) {
+              _urlController.clear();
+              widget.onUrlChanged(null);
+            }
+            if (_selectedImage != null) {
+              _selectedImage = null;
+              widget.onFileChanged(null);
+            }
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Image deleted from storage successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error deleting image: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  /// Show dialog to confirm image deletion from Supabase
+  void _showDeleteConfirmationDialog(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Image'),
+          content: const Text(
+            'Are you sure you want to delete this image from storage? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteImageFromSupabase(imageUrl);
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -260,6 +353,11 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
                     // This will trigger a rebuild to show/hide the clear button
                   });
                   widget.onUrlChanged(value.isNotEmpty ? value : null);
+
+                  // If the URL changed and it's not in our uploaded images, remove it from tracking
+                  if (value.isNotEmpty && !_uploadedImages.contains(value)) {
+                    // This is a new URL, not one we uploaded
+                  }
                 },
               ),
               const SizedBox(height: 8),
@@ -284,6 +382,24 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorManager.secondaryColor,
                     foregroundColor: Colors.white,
+                  ),
+                ),
+
+              // Delete from Supabase button (only show for uploaded images)
+              if (_urlController.text.isNotEmpty &&
+                  _uploadedImages.contains(_urlController.text))
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: ElevatedButton.icon(
+                    onPressed:
+                        () =>
+                            _showDeleteConfirmationDialog(_urlController.text),
+                    icon: const Icon(Icons.delete_forever),
+                    label: const Text('Delete from Storage'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
                 ),
 
@@ -428,6 +544,30 @@ class _EnhancedImageFieldState extends State<EnhancedImageField> {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ColorManager.primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Delete from Supabase button for uploaded images (when in file mode but URL is set)
+              if (_selectedImage == null &&
+                  _urlController.text.isNotEmpty &&
+                  _uploadedImages.contains(_urlController.text))
+                Positioned(
+                  bottom: 16,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: ElevatedButton.icon(
+                      onPressed:
+                          () => _showDeleteConfirmationDialog(
+                            _urlController.text,
+                          ),
+                      icon: const Icon(Icons.delete_forever),
+                      label: const Text('Delete from Storage'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
                       ),
                     ),
